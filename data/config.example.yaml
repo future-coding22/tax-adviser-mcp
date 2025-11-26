@@ -1,0 +1,312 @@
+# =============================================================================
+# Tax Advisor MCP Server - Configuration File
+# =============================================================================
+# This file controls all aspects of the tax advisor MCP server behavior.
+# Copy this to 'config.yaml' and customize for your needs.
+
+# =============================================================================
+# SERVER SETTINGS
+# =============================================================================
+server:
+  name: "tax-advisor"
+  version: "1.0.0"
+
+  # Logging configuration
+  logging:
+    level: "info"  # debug | info | warn | error
+    file: "./logs/server.log"  # Log file path (null for console only)
+    max_file_size: "10MB"  # Max size before rotation
+    max_files: 5  # Number of rotated log files to keep
+    include_timestamps: true
+    format: "json"  # json | text
+
+  # Performance settings
+  performance:
+    max_concurrent_operations: 5  # Max parallel operations
+    request_timeout_ms: 30000  # 30 seconds
+    cache_size_mb: 50  # In-memory cache size
+
+# =============================================================================
+# COUNTRY & LOCALIZATION
+# =============================================================================
+country:
+  code: "NL"  # ISO 3166-1 alpha-2 (NL, DE, BE, etc.)
+  timezone: "Europe/Amsterdam"  # For date/time operations
+  currency: "EUR"
+  date_format: "DD-MM-YYYY"  # How to format dates in output
+  language: "nl"  # nl | en (for output messages)
+
+# =============================================================================
+# FILE PATHS
+# =============================================================================
+paths:
+  personal_data: "./data/personal.md"
+  tax_rules: "./data/dutch-tax-rules.json"
+  knowledge_base: "./knowledge"
+  logs: "./logs"
+  backups: "./backups"
+  temp: "./tmp"
+
+# =============================================================================
+# KNOWLEDGE CACHE SYSTEM
+# =============================================================================
+knowledge:
+  # Core settings
+  enabled: true
+  auto_cache: true  # Automatically cache web search results
+
+  # Cache behavior
+  default_expiry_days: 90  # How long entries stay fresh
+  min_confidence: "medium"  # Minimum confidence to cache: low | medium | high
+  min_relevance_score: 50  # Minimum relevance score (0-100) to cache
+
+  # Storage options (USER REQUESTED CONFIGURABILITY)
+  track_in_git: true  # Track knowledge cache in version control
+  seed_initial_entries: true  # Create example entries on first setup
+  export_format: "markdown"  # markdown | json | both
+
+  # Refresh strategy (USER REQUESTED CONFIGURABILITY)
+  refresh_strategy: "weekly"  # weekly | on-demand | disabled
+  refresh_schedule: "0 3 * * 0"  # Cron: Sunday 3 AM (if weekly)
+  auto_refresh_expired: true  # Auto-refresh expired entries
+
+  # Change detection (USER REQUESTED CONFIGURABILITY)
+  change_notifications: "profile-specific"  # all | profile-specific | disabled
+  detect_law_changes: true
+  change_significance_threshold: "medium"  # low | medium | high
+
+  # Cache maintenance
+  auto_prune_enabled: true
+  prune_schedule: "0 2 1 * *"  # Cron: 1st of month at 2 AM
+  max_entries: 500  # Max before auto-pruning
+  min_access_count_to_keep: 2  # Keep entries accessed at least N times
+
+  # Categories
+  categories:
+    - income-tax
+    - box3
+    - btw
+    - self-employment
+    - deductions
+    - general
+
+  # Backup
+  auto_backup: true
+  backup_frequency: "weekly"  # daily | weekly | monthly
+  backup_retention_days: 90
+
+# =============================================================================
+# TELEGRAM INTEGRATION
+# =============================================================================
+telegram:
+  enabled: true
+
+  # Authentication (use environment variables for security)
+  bot_token: "${TELEGRAM_BOT_TOKEN}"
+  chat_id: "${TELEGRAM_CHAT_ID}"
+
+  # Message formatting
+  message_format: "markdown"  # markdown | html | plain
+  include_emojis: true  # Use emojis in messages
+  max_message_length: 4000  # Split longer messages
+
+  # Notification settings
+  notification_level: "all"  # all | important | critical
+  quiet_hours:
+    enabled: false
+    start: "22:00"  # Don't send notifications between these times
+    end: "08:00"
+    timezone: "Europe/Amsterdam"
+
+  # Delivery settings
+  retry_attempts: 3
+  retry_delay_seconds: 5
+  timeout_seconds: 10
+
+  # Rate limiting
+  rate_limit:
+    enabled: true
+    max_per_minute: 10
+    max_per_hour: 50
+
+# =============================================================================
+# REMINDERS & NOTIFICATIONS
+# =============================================================================
+reminders:
+  enabled: true
+
+  # Scheduling
+  check_schedule: "0 9 * * *"  # Cron: daily at 9 AM
+  timezone: "Europe/Amsterdam"
+
+  # Reminder timing
+  default_days_before: [7, 3, 1]  # Remind at 7, 3, and 1 day before
+  include_weekends: true  # Send reminders on weekends
+
+  # Reminder content
+  format: "detailed"  # brief | detailed
+  include_amounts: true
+  include_actions: true  # Include action items
+  consolidate_daily: true  # Group multiple reminders into one message
+  max_per_day: 5  # Max individual reminders per day
+
+  # Tracking
+  state_file: "./.reminder-state.json"
+  mark_sent: true  # Track which reminders were sent
+  prevent_duplicates: true
+
+# =============================================================================
+# TAX CALCULATION
+# =============================================================================
+tax:
+  # Tax year
+  year: 2024
+  use_provisional_rates: true  # Use announced rates for current/future year
+
+  # Calculation behavior
+  default_filing_status: "single"  # single | married | partners
+  include_estimates: true  # Include estimated amounts
+  rounding_method: "standard"  # standard | up | down
+  currency: "EUR"
+
+  # Display options
+  show_breakdown: true  # Show detailed calculation steps by default
+  show_comparisons: true  # Compare with previous years
+  include_disclaimers: true  # Include tax advice disclaimers
+
+  # Box-specific settings
+  box1:
+    include_employment: true
+    include_self_employment: true
+    include_benefits: true
+
+  box3:
+    split_savings_investments: true  # Separate savings vs investments
+    include_crypto: true
+    include_property: true
+
+# =============================================================================
+# WEB SEARCH
+# =============================================================================
+search:
+  enabled: true
+
+  # Search sources
+  sources:
+    - "belastingdienst.nl"
+    - "wetten.nl"
+    - "rijksoverheid.nl"
+
+  # Search behavior
+  max_results: 10
+  timeout_seconds: 15
+  user_agent: "TaxAdvisorMCP/1.0"
+
+  # Rate limiting (respect server policies)
+  rate_limit:
+    enabled: true
+    delay_between_requests_ms: 1000  # 1 second between requests
+    max_concurrent_requests: 2
+
+  # Result filtering
+  min_relevance: 0.5  # 0.0 - 1.0
+  exclude_outdated: true
+  max_age_days: 365  # Don't show results older than 1 year
+
+  # Caching
+  cache_results: true
+  cache_duration_hours: 24
+
+# =============================================================================
+# PERSONAL DATA
+# =============================================================================
+personal_data:
+  # Validation
+  validate_on_load: true
+  require_bsn: false  # Require BSN to be filled in
+  require_kvk: false  # Require KVK for self-employed
+
+  # Privacy
+  encryption_enabled: false  # Encrypt personal.md at rest (requires key)
+  encryption_key_file: "./data/.encryption.key"
+
+  # Backup
+  auto_backup: true
+  backup_on_change: true
+  backup_location: "./backups/personal/"
+  backup_retention_days: 365
+
+  # Parsing
+  strict_mode: false  # Fail on parsing errors vs. warn
+  auto_fix_formatting: true  # Try to fix common formatting issues
+
+# =============================================================================
+# MCP SERVER
+# =============================================================================
+mcp:
+  # Server identification
+  name: "tax-advisor"
+  description: "Personal tax and financial advisor for Dutch residents"
+
+  # Capabilities
+  tools:
+    enabled: true
+    timeout_seconds: 30
+
+  resources:
+    enabled: true
+    cache_resources: true
+
+  prompts:
+    enabled: false  # Enable custom prompts (future feature)
+
+# =============================================================================
+# DEVELOPMENT & DEBUGGING
+# =============================================================================
+development:
+  # Debug mode
+  debug: false
+  verbose_logging: false
+
+  # Mock services (for testing without real APIs)
+  mock_telegram: false  # Use mock instead of real Telegram API
+  mock_web_search: false  # Use mock search results
+
+  # Testing
+  test_mode: false  # Enable test mode features
+  bypass_validation: false  # Skip some validations (dangerous!)
+
+# =============================================================================
+# ADVANCED SETTINGS
+# =============================================================================
+advanced:
+  # Error handling
+  retry_on_failure: true
+  max_retry_attempts: 3
+  exponential_backoff: true
+
+  # Resource limits
+  max_memory_mb: 512
+  max_disk_usage_mb: 1024
+
+  # Concurrency
+  enable_parallel_operations: true
+  worker_threads: 2
+
+  # Feature flags (experimental features)
+  features:
+    multi_currency: false
+    receipt_scanning: false
+    bank_integration: false
+    ai_summaries: true  # Use AI to summarize search results
+    smart_deductions: true  # AI-powered deduction recommendations
+
+# =============================================================================
+# NOTES
+# =============================================================================
+# 1. Environment variables can be used with ${VAR_NAME} syntax
+# 2. Cron format: "minute hour day month weekday"
+# 3. Paths can be absolute or relative to this config file
+# 4. Boolean values: true/false (lowercase)
+# 5. Strings with special chars should be quoted
+# 6. Comments start with #

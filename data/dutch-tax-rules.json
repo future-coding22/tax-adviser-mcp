@@ -1,0 +1,296 @@
+{
+  "tax_year": 2024,
+  "last_updated": "2024-11-26",
+  "description": "Dutch tax rules and rates for 2024",
+
+  "income_tax": {
+    "box1_brackets": [
+      {
+        "from": 0,
+        "to": 75518,
+        "rate": 36.97
+      },
+      {
+        "from": 75518,
+        "to": null,
+        "rate": 49.50
+      }
+    ],
+    "general_credit": {
+      "max": 3362,
+      "phase_out_start": 24812,
+      "phase_out_end": 79952,
+      "phase_out_rate": 6.095
+    },
+    "labor_credit": {
+      "max": 5052,
+      "brackets": [
+        {
+          "from": 0,
+          "to": 11491,
+          "rate": 8.231,
+          "type": "percentage_of_income"
+        },
+        {
+          "from": 11491,
+          "to": 24821,
+          "base": 946,
+          "additional_rate": 31.732,
+          "type": "base_plus_percentage"
+        },
+        {
+          "from": 24821,
+          "to": 38441,
+          "amount": 5052,
+          "type": "fixed"
+        }
+      ],
+      "phase_out_start": 38441,
+      "phase_out_end": 124934,
+      "phase_out_rate": 6.51
+    }
+  },
+
+  "box2": {
+    "description": "Income from substantial interest",
+    "threshold_percentage": 5,
+    "tax_rate": 26.9,
+    "applies_to": [
+      "Dividends from substantial interest",
+      "Capital gains from substantial interest"
+    ]
+  },
+
+  "box3": {
+    "description": "Income from savings and investments",
+    "exemption": 57000,
+    "exemption_partners": 114000,
+    "deemed_return_categories": [
+      {
+        "category": "savings",
+        "description": "Bank savings accounts",
+        "rate": 1.03
+      },
+      {
+        "category": "investments",
+        "description": "Stocks, ETFs, crypto, property",
+        "rate": 6.04
+      }
+    ],
+    "tax_rate": 32.0,
+    "deductible_debts": [
+      "Student loans (DUO)",
+      "Personal loans",
+      "Investment loans",
+      "Mortgage on non-primary residence"
+    ]
+  },
+
+  "btw": {
+    "standard_rate": 21.0,
+    "reduced_rate": 9.0,
+    "zero_rate": 0.0,
+    "small_business_threshold": 25000,
+    "kor_scheme": {
+      "name": "Kleine Ondernemers Regeling",
+      "threshold": 25000,
+      "benefits": [
+        "No BTW charged to customers",
+        "No BTW returns required",
+        "Simpler administration"
+      ],
+      "drawbacks": [
+        "Cannot reclaim BTW on expenses"
+      ]
+    },
+    "filing_frequency": {
+      "quarterly": "Most common for small businesses",
+      "monthly": "High turnover businesses",
+      "annual": "Very small businesses"
+    },
+    "deadlines": {
+      "quarterly": [
+        {
+          "quarter": "Q1",
+          "period": "Jan-Mar",
+          "deadline": "April 30"
+        },
+        {
+          "quarter": "Q2",
+          "period": "Apr-Jun",
+          "deadline": "July 31"
+        },
+        {
+          "quarter": "Q3",
+          "period": "Jul-Sep",
+          "deadline": "October 31"
+        },
+        {
+          "quarter": "Q4",
+          "period": "Oct-Dec",
+          "deadline": "January 31 (next year)"
+        }
+      ]
+    }
+  },
+
+  "self_employment": {
+    "zelfstandigenaftrek": {
+      "amount": 3750,
+      "hours_requirement": 1225,
+      "description": "Self-employment deduction (being phased out)",
+      "phase_out_schedule": [
+        {"year": 2023, "amount": 5030},
+        {"year": 2024, "amount": 3750},
+        {"year": 2025, "amount": 2470},
+        {"year": 2026, "amount": 1190},
+        {"year": 2027, "amount": 0}
+      ]
+    },
+    "startersaftrek": {
+      "amount": 2123,
+      "description": "Additional deduction for first 3 years",
+      "eligibility": "First three calendar years as entrepreneur",
+      "must_be_consecutive": true
+    },
+    "mkb_vrijstelling": {
+      "percentage": 13.31,
+      "description": "SME profit exemption - percentage of profit tax-free",
+      "applies_to": "All entrepreneurs (ZZP, sole proprietors)"
+    },
+    "hours_requirement": {
+      "standard": 1225,
+      "description": "Minimum hours per year to qualify for zelfstandigenaftrek",
+      "what_counts": [
+        "Client work",
+        "Administration",
+        "Marketing",
+        "Professional development",
+        "Business travel"
+      ],
+      "what_doesnt_count": [
+        "Commuting",
+        "Personal development unrelated to business"
+      ]
+    }
+  },
+
+  "deadlines": {
+    "income_tax_filing": "May 1",
+    "income_tax_filing_date": "2024-05-01",
+    "income_tax_extension": "September 1",
+    "income_tax_extension_date": "2024-09-01",
+    "btw_quarterly": [
+      "2024-04-30",
+      "2024-07-31",
+      "2024-10-31",
+      "2025-01-31"
+    ],
+    "provisional_assessment": {
+      "description": "Voorlopige aanslag - quarterly or monthly payments",
+      "frequency": "Usually quarterly",
+      "months": [3, 6, 9, 12]
+    }
+  },
+
+  "deduction_limits": {
+    "gifts": {
+      "minimum": 60,
+      "maximum_percentage": 10,
+      "description": "Charitable donations to ANBI organizations",
+      "requirements": [
+        "Must be to ANBI-registered charity",
+        "Minimum €60 per year",
+        "Maximum 10% of taxable income"
+      ]
+    },
+    "medical_expenses": {
+      "threshold_percentage": 5.75,
+      "description": "Medical expenses above threshold deductible",
+      "calculation": "Threshold is 5.75% of income in Box 1 + Box 3"
+    },
+    "mortgage_interest": {
+      "maximum_rate": 100,
+      "description": "Mortgage interest on primary residence",
+      "requirements": [
+        "Primary residence only",
+        "Annuity or linear mortgage",
+        "Maximum 30-year term"
+      ],
+      "phase_out": {
+        "current_rate": 100,
+        "note": "No longer being phased out (was reduced from 2014-2023)"
+      }
+    }
+  },
+
+  "special_rules": {
+    "30_percent_ruling": {
+      "description": "Tax-free reimbursement for expat employees",
+      "percentage": 30,
+      "max_duration_years": 5,
+      "requirements": [
+        "Recruited from abroad",
+        "Scarce expertise",
+        "Minimum salary threshold",
+        "Lived >150km from Dutch border for 2/3 of 24 months before employment"
+      ]
+    },
+    "tax_partner": {
+      "description": "Fiscal partnership for tax purposes",
+      "benefits": [
+        "Double Box 3 exemption",
+        "Income splitting opportunities",
+        "Combined tax credits optimization"
+      ],
+      "requirements": [
+        "Married or registered partnership",
+        "OR living together with shared household for 6+ months"
+      ]
+    }
+  },
+
+  "penalties": {
+    "late_filing": {
+      "minimum": 396,
+      "maximum": 5278,
+      "description": "Penalty for late tax return filing"
+    },
+    "late_payment": {
+      "interest_rate": 8.0,
+      "description": "Interest charged on unpaid tax",
+      "calculation": "Per year, calculated daily"
+    },
+    "false_declaration": {
+      "percentage": 25,
+      "description": "Penalty for incorrect information",
+      "can_increase": "Up to 100% for intentional fraud"
+    }
+  },
+
+  "sources": [
+    {
+      "name": "Belastingdienst",
+      "url": "https://www.belastingdienst.nl/",
+      "description": "Dutch Tax Authority official website"
+    },
+    {
+      "name": "Belastingplan 2024",
+      "url": "https://www.belastingdienst.nl/wps/wcm/connect/nl/belastingplan/",
+      "description": "Official tax plan for 2024"
+    },
+    {
+      "name": "Wet IB 2001",
+      "url": "https://wetten.overheid.nl/BWBR0011353/",
+      "description": "Income Tax Act 2001 (legislation)"
+    }
+  ],
+
+  "notes": [
+    "All amounts in EUR unless specified otherwise",
+    "Rates and amounts are for calendar year 2024",
+    "This data is for informational purposes only",
+    "Always verify with official Belastingdienst sources",
+    "Consult a tax advisor for personal tax advice"
+  ]
+}
