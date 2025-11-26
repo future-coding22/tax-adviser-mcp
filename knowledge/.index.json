@@ -1,0 +1,155 @@
+{
+  "version": "1.0",
+  "last_updated": "2024-11-26T00:00:00Z",
+  "entries": [
+    {
+      "id": "box3-deemed-return-2024",
+      "file_path": "box3/deemed-return-rates-2024.md",
+      "title": "Box 3 Deemed Return Rates for 2024",
+      "category": "box3",
+      "tags": ["box3", "vermogensrendementsheffing", "rates", "2024"],
+      "sources": [
+        {
+          "url": "https://www.belastingdienst.nl/wps/wcm/connect/nl/box-3/",
+          "title": "Belastingdienst - Box 3 Sparen en beleggen",
+          "accessed_at": "2024-11-26T00:00:00Z"
+        }
+      ],
+      "created_at": "2024-11-26T00:00:00Z",
+      "updated_at": "2024-11-26T00:00:00Z",
+      "expires_at": "2025-01-01T00:00:00Z",
+      "tax_years": [2024],
+      "relevance_score": 100,
+      "summary": "Box 3 uses deemed returns: 1.03% for savings, 6.04% for investments. Tax rate 32%."
+    },
+    {
+      "id": "btw-filing-deadlines-2024",
+      "file_path": "btw/filing-deadlines.md",
+      "title": "BTW Filing Deadlines and Requirements",
+      "category": "btw",
+      "tags": ["btw", "vat", "deadlines", "quarterly", "filing"],
+      "sources": [
+        {
+          "url": "https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/",
+          "title": "Belastingdienst - BTW aangifte",
+          "accessed_at": "2024-11-26T00:00:00Z"
+        }
+      ],
+      "created_at": "2024-11-26T00:00:00Z",
+      "updated_at": "2024-11-26T00:00:00Z",
+      "expires_at": "2025-12-31T00:00:00Z",
+      "tax_years": [2024, 2025],
+      "relevance_score": 95,
+      "summary": "BTW quarterly deadlines: end of month following quarter. Standard rate 21%, reduced 9%."
+    },
+    {
+      "id": "zelfstandigenaftrek-2024",
+      "file_path": "self-employment/zelfstandigenaftrek-2024.md",
+      "title": "Zelfstandigenaftrek (Self-Employment Deduction) 2024",
+      "category": "self-employment",
+      "tags": ["zelfstandigenaftrek", "freelance", "zzp", "deduction", "2024"],
+      "sources": [
+        {
+          "url": "https://www.belastingdienst.nl/wps/wcm/connect/nl/zelfstandigen/",
+          "title": "Belastingdienst - Zelfstandigenaftrek",
+          "accessed_at": "2024-11-26T00:00:00Z"
+        }
+      ],
+      "created_at": "2024-11-26T00:00:00Z",
+      "updated_at": "2024-11-26T00:00:00Z",
+      "expires_at": "2025-01-01T00:00:00Z",
+      "tax_years": [2024],
+      "relevance_score": 90,
+      "summary": "€3,750 deduction for self-employed with 1,225+ hours. Being phased out by 2027."
+    },
+    {
+      "id": "box1-brackets-2024",
+      "file_path": "income-tax/box1-brackets-2024.md",
+      "title": "Income Tax Brackets (Box 1) 2024",
+      "category": "income-tax",
+      "tags": ["box1", "income-tax", "brackets", "rates", "2024"],
+      "sources": [
+        {
+          "url": "https://www.belastingdienst.nl/wps/wcm/connect/nl/belastingplan/",
+          "title": "Belastingdienst - Belastingplan 2024",
+          "accessed_at": "2024-11-26T00:00:00Z"
+        }
+      ],
+      "created_at": "2024-11-26T00:00:00Z",
+      "updated_at": "2024-11-26T00:00:00Z",
+      "expires_at": "2025-01-01T00:00:00Z",
+      "tax_years": [2024],
+      "relevance_score": 100,
+      "summary": "Box 1 brackets: 36.97% up to €75,518, then 49.50%. Includes general and labor credits."
+    },
+    {
+      "id": "mkb-winstvrijstelling-2024",
+      "file_path": "self-employment/mkb-winstvrijstelling.md",
+      "title": "MKB-winstvrijstelling (SME Profit Exemption)",
+      "category": "self-employment",
+      "tags": ["mkb", "winstvrijstelling", "profit-exemption", "freelance"],
+      "sources": [
+        {
+          "url": "https://www.belastingdienst.nl/wps/wcm/connect/nl/ondernemers/",
+          "title": "Belastingdienst - MKB-winstvrijstelling",
+          "accessed_at": "2024-11-26T00:00:00Z"
+        }
+      ],
+      "created_at": "2024-11-26T00:00:00Z",
+      "updated_at": "2024-11-26T00:00:00Z",
+      "expires_at": "2025-12-31T00:00:00Z",
+      "tax_years": [2024, 2025],
+      "relevance_score": 85,
+      "summary": "13.31% of business profit is tax-exempt for SME entrepreneurs."
+    },
+    {
+      "id": "income-tax-deadlines-2024",
+      "file_path": "general/tax-calendar-2024.md",
+      "title": "Dutch Tax Calendar and Deadlines 2024",
+      "category": "general",
+      "tags": ["deadlines", "calendar", "filing", "aangifte"],
+      "sources": [
+        {
+          "url": "https://www.belastingdienst.nl/wps/wcm/connect/nl/aangifte/",
+          "title": "Belastingdienst - Aangiftetermijnen",
+          "accessed_at": "2024-11-26T00:00:00Z"
+        }
+      ],
+      "created_at": "2024-11-26T00:00:00Z",
+      "updated_at": "2024-11-26T00:00:00Z",
+      "expires_at": "2025-01-01T00:00:00Z",
+      "tax_years": [2024],
+      "relevance_score": 100,
+      "summary": "Income tax filing: May 1. BTW quarterly. Provisional assessment throughout year."
+    },
+    {
+      "id": "tax-credits-2024",
+      "file_path": "deductions/tax-credits-overview.md",
+      "title": "Dutch Tax Credits Overview 2024",
+      "category": "deductions",
+      "tags": ["credits", "heffingskorting", "arbeidskorting", "algemeen"],
+      "sources": [
+        {
+          "url": "https://www.belastingdienst.nl/wps/wcm/connect/nl/heffingskortingen/",
+          "title": "Belastingdienst - Heffingskortingen",
+          "accessed_at": "2024-11-26T00:00:00Z"
+        }
+      ],
+      "created_at": "2024-11-26T00:00:00Z",
+      "updated_at": "2024-11-26T00:00:00Z",
+      "expires_at": "2025-01-01T00:00:00Z",
+      "tax_years": [2024],
+      "relevance_score": 95,
+      "summary": "General credit €3,362, labor credit max €5,052 with phase-out from €38,441."
+    }
+  ],
+  "categories": [
+    "income-tax",
+    "box3",
+    "btw",
+    "self-employment",
+    "deductions",
+    "general"
+  ],
+  "total_entries": 7
+}
