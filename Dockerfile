@@ -34,7 +34,7 @@ WORKDIR /app
 # Copy production dependencies from 'deps' stage
 COPY --from=deps /app/node_modules ./node_modules
 # Copy compiled source code from 'builder' stage
-#COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/dist ./dist
 # Copy package.json to be able to run npm scripts
 COPY package.json .
 # Copy data and knowledge directories which are needed at runtime
@@ -42,7 +42,7 @@ COPY data ./data
 COPY knowledge ./knowledge
 
 # Expose the default port for the MCP server
-EXPOSE 3033
+EXPOSE 3000
 
 ENV NODE_ENV=production
 
