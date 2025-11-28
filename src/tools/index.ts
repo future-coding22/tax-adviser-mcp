@@ -9,6 +9,7 @@ import { GetKnowledgeEntryTool } from './get-knowledge-entry.js';
 import { RefreshKnowledgeTool } from './refresh-knowledge.js';
 import { GetLawChangesTool } from './get-law-changes.js';
 import { GetSpendingAdviceTool } from './get-spending-advice.js';
+import { AddCountryTool } from './add-country.js';
 
 /**
  * Tool handler interface
@@ -50,6 +51,9 @@ export class ToolRegistry {
     this.register(new RefreshKnowledgeTool(this.config, this.dependencies));
     this.register(new GetLawChangesTool(this.config, this.dependencies));
     this.register(new GetSpendingAdviceTool(this.config, this.dependencies));
+
+    // Phase 11: Multi-country support
+    this.register(new AddCountryTool(this.config, this.dependencies));
   }
 
   /**
@@ -101,7 +105,8 @@ export class ToolRegistry {
  */
 export interface ToolDependencies {
   personalLoader: any;
-  taxKnowledge: any;
+  taxKnowledge: any; // Legacy Dutch-only knowledge (deprecated)
+  taxKnowledgeFactory: any; // New multi-country factory
   knowledgeLoader: any;
   knowledgeCache: any;
   telegramService: any;
