@@ -1,14 +1,21 @@
 # 🏦 Tax Adviser MCP Server
 
-A comprehensive **Model Context Protocol (MCP)** server providing intelligent Dutch tax assistance through Claude Desktop. Features include tax calculations, deadline tracking, knowledge caching, and automated reminders.
+A comprehensive **Model Context Protocol (MCP)** server providing intelligent multi-country tax assistance through Claude Desktop. Features include tax calculations, deadline tracking, knowledge caching, automated reminders, and autonomous country discovery.
 
 ## ✨ Features
 
+### 🌍 Multi-Country Support (NEW!)
+- **Glossary-Based Architecture** with 54+ universal tax concepts
+- **Netherlands Fully Implemented** (Box 1/2/3, BTW, 2024 rates)
+- **Autonomous Country Discovery** via `add_country` tool
+- **Extensible Framework** for adding new countries
+- **See [Multi-Country Guide](./docs/MULTI_COUNTRY.md)** for details
+
 ### 📊 Core Capabilities
-- **10 MCP Tools** for tax calculations, searches, and advice
+- **11 MCP Tools** for tax calculations, searches, advice, and country setup
 - **11 MCP Resources** exposing tax data and knowledge
 - **3 Built-in Prompts** for common tax workflows
-- **Complete Dutch Tax Support** (2024 rates and rules)
+- **Country-Agnostic Interface** for future expansion
 
 ### 🧠 Knowledge Cache System
 - **Cache-first search** for instant answers
@@ -80,6 +87,7 @@ Restart Claude Desktop and the server will be available!
 - **[SETUP.md](./SETUP.md)** - Detailed setup and configuration guide
 - **[API.md](./API.md)** - Complete tool and resource reference
 - **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)** - System architecture overview
+- **[MULTI_COUNTRY.md](./docs/MULTI_COUNTRY.md)** ⭐ - Multi-country support guide (NEW!)
 
 ## 🛠️ Available Tools
 
@@ -88,13 +96,14 @@ Restart Claude Desktop and the server will be available!
 | `get_tax_obligations` | Get all applicable tax obligations with deadlines |
 | `get_upcoming_dues` | Track upcoming payments from recurring schedule |
 | `send_reminder` | Send Telegram notifications with scheduling |
-| `calculate_tax_estimate` | Comprehensive Dutch tax calculation (Box 1/2/3, BTW) |
+| `calculate_tax_estimate` | Comprehensive tax calculation (Box 1/2/3, BTW for NL) |
 | `search_dutch_tax_law` | Cache-first web search for tax laws |
 | `search_knowledge_base` | Search local knowledge cache |
 | `get_knowledge_entry` | Retrieve full knowledge entry by ID |
 | `refresh_knowledge` | Manually refresh cached entries |
 | `get_law_changes` | Detect tax law changes between years |
 | `get_spending_advice` | Personalized financial optimization advice |
+| **`add_country`** ⭐ | **Autonomously discover and set up new country support** |
 
 ## 📦 Available Resources
 

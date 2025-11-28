@@ -16,10 +16,12 @@ import { createToolRegistry } from './tools/index.js';
 import { createResourceRegistry } from './resources/index.js';
 import { personalProfileLoader } from './context/personal-loader.js';
 import { createDutchTaxKnowledge } from './context/dutch-tax-knowledge.js';
+import { createTaxKnowledgeFactory } from './knowledge/TaxKnowledgeFactory.js';
 import { KnowledgeCacheService } from './services/knowledge-cache.js';
 import { KnowledgeLoader } from './services/knowledge-loader.js';
 import { TelegramService } from './services/telegram.js';
 import { WebSearchService } from './services/web-search.js';
+import path from 'path';
 
 /**
  * Tax Adviser MCP Server
@@ -59,6 +61,11 @@ class TaxAdviserServer {
 
       // Initialize services
       const taxKnowledge = createDutchTaxKnowledge(this.config.paths.tax_rules);
+      const taxKnowledgeFactory = createTaxKnowledgeFactory({
+        taxRulesDir: path.dirname(this.config.paths.tax_rules),
+        glossaryDir: path.join(process.cwd(), 'knowledge', '_glossary'),
+        defaultCountry: 'NL',
+      });
       const knowledgeLoader = new KnowledgeLoader(this.config.paths.knowledge_base);
       const knowledgeCache = new KnowledgeCacheService(
         this.config.paths.knowledge_base,
@@ -75,7 +82,8 @@ class TaxAdviserServer {
       // Create tool and resource registries
       const dependencies = {
         personalLoader: personalProfileLoader,
-        taxKnowledge,
+        taxKnowledge, // Legacy Dutch-only (deprecated)
+        taxKnowledgeFactory, // New multi-country factory
         knowledgeLoader,
         knowledgeCache,
         telegramService,

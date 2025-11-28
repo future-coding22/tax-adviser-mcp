@@ -1,0 +1,1065 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2024-01-15T00:00:00Z",
+  "concepts": [
+    {
+      "id": "income_tax",
+      "name": "Income Tax",
+      "description": "Tax on personal or business income earned within a tax period",
+      "category": "direct_tax",
+      "subcategories": ["personal_tax", "progressive_tax"],
+      "parent": null,
+      "children": ["income_tax_progressive", "income_tax_flat"],
+      "applies_in": ["NL", "US", "GB", "DE", "FR", "ES", "IT", "BE", "SE", "NO"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Inkomstenbelasting",
+        "US": "Income Tax",
+        "GB": "Income Tax",
+        "DE": "Einkommensteuer",
+        "FR": "Impôt sur le revenu",
+        "ES": "Impuesto sobre la Renta",
+        "IT": "Imposta sul reddito"
+      },
+      "notes": "Most common form of direct taxation worldwide",
+      "metadata": {
+        "filing_frequency": {
+          "NL": "annual",
+          "US": "annual",
+          "GB": "annual"
+        },
+        "mandatory": true,
+        "related_concepts": ["income_tax_progressive", "income_tax_flat", "tax_bracket"]
+      }
+    },
+    {
+      "id": "income_tax_progressive",
+      "name": "Progressive Income Tax",
+      "description": "Income tax calculated using progressive tax brackets where higher income is taxed at higher rates",
+      "category": "calculation_method",
+      "subcategories": ["tax_structure"],
+      "parent": "income_tax",
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR", "ES", "IT", "BE", "SE"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Progressief tarief",
+        "US": "Progressive Tax Brackets",
+        "GB": "Progressive Tax Bands",
+        "DE": "Progressiver Steuersatz",
+        "FR": "Barème progressif"
+      },
+      "notes": "Tax rate increases as taxable income increases",
+      "metadata": {
+        "mandatory": true,
+        "related_concepts": ["tax_bracket", "marginal_rate", "effective_rate"]
+      }
+    },
+    {
+      "id": "income_tax_flat",
+      "name": "Flat Income Tax",
+      "description": "Income tax calculated at a single fixed rate regardless of income level",
+      "category": "calculation_method",
+      "subcategories": ["tax_structure"],
+      "parent": "income_tax",
+      "children": [],
+      "applies_in": ["EE", "LV", "LT", "BG", "RO", "HU"],
+      "not_applicable_in": ["NL", "US", "GB", "DE", "FR"],
+      "alternatives": {
+        "EE": "Tulumaks",
+        "LV": "Iedzīvotāju ienākuma nodoklis",
+        "LT": "Gyventojų pajamų mokestis",
+        "BG": "Данък върху доходите",
+        "RO": "Impozit pe venit"
+      },
+      "notes": "Common in Eastern European countries",
+      "metadata": {
+        "typical_rates": {
+          "EE": 20,
+          "LV": 20,
+          "LT": 15,
+          "BG": 10,
+          "RO": 10,
+          "HU": 15
+        },
+        "mandatory": true
+      }
+    },
+    {
+      "id": "vat",
+      "name": "Value Added Tax (VAT)",
+      "description": "Consumption tax levied on the value added to goods and services at each stage of production or distribution",
+      "category": "indirect_tax",
+      "subcategories": ["consumption_tax"],
+      "parent": null,
+      "children": ["vat_standard", "vat_reduced", "vat_zero"],
+      "applies_in": ["NL", "GB", "DE", "FR", "ES", "IT", "BE", "SE", "NO", "DK"],
+      "not_applicable_in": ["US"],
+      "alternatives": {
+        "NL": "BTW (Belasting over de Toegevoegde Waarde)",
+        "GB": "VAT",
+        "DE": "Mehrwertsteuer (MwSt)",
+        "FR": "TVA (Taxe sur la Valeur Ajoutée)",
+        "ES": "IVA (Impuesto sobre el Valor Añadido)",
+        "IT": "IVA (Imposta sul Valore Aggiunto)"
+      },
+      "notes": "Most common consumption tax outside North America",
+      "metadata": {
+        "typical_rates": {
+          "NL": 21,
+          "GB": 20,
+          "DE": 19,
+          "FR": 20,
+          "ES": 21,
+          "IT": 22,
+          "BE": 21,
+          "SE": 25
+        },
+        "filing_frequency": {
+          "NL": "quarterly",
+          "GB": "quarterly",
+          "DE": "monthly"
+        },
+        "mandatory": true,
+        "related_concepts": ["vat_standard", "vat_reduced", "quarterly_vat_return"]
+      }
+    },
+    {
+      "id": "sales_tax",
+      "name": "Sales Tax",
+      "description": "Tax on retail sales of goods and services, collected at point of sale",
+      "category": "indirect_tax",
+      "subcategories": ["consumption_tax"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["US", "CA"],
+      "not_applicable_in": ["NL", "GB", "DE", "FR", "ES", "IT"],
+      "alternatives": {
+        "US": "Sales Tax",
+        "CA": "Sales Tax / PST / GST / HST"
+      },
+      "notes": "Used in US and Canada instead of VAT",
+      "metadata": {
+        "typical_rates": {
+          "US": 7.5,
+          "CA": 5
+        },
+        "filing_frequency": {
+          "US": "monthly",
+          "CA": "quarterly"
+        }
+      }
+    },
+    {
+      "id": "social_security",
+      "name": "Social Security Contributions",
+      "description": "Mandatory contributions to social insurance programs covering pensions, disability, and survivors benefits",
+      "category": "social_contribution",
+      "subcategories": ["mandatory_insurance"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR", "ES", "IT", "BE"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "AOW/ANW",
+        "US": "Social Security Tax (FICA)",
+        "GB": "National Insurance",
+        "DE": "Rentenversicherung",
+        "FR": "Cotisations sociales",
+        "ES": "Seguridad Social"
+      },
+      "notes": "Usually split between employer and employee",
+      "metadata": {
+        "typical_rates": {
+          "NL": 17.9,
+          "US": 12.4,
+          "GB": 13.8,
+          "DE": 18.6,
+          "FR": 15.45
+        },
+        "filing_frequency": {
+          "NL": "monthly",
+          "US": "monthly",
+          "GB": "monthly"
+        },
+        "mandatory": true
+      }
+    },
+    {
+      "id": "health_insurance_mandatory",
+      "name": "Mandatory Health Insurance",
+      "description": "Required health insurance contributions to cover medical costs",
+      "category": "social_contribution",
+      "subcategories": ["mandatory_insurance"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "DE", "FR", "BE", "CH"],
+      "not_applicable_in": ["US", "GB"],
+      "alternatives": {
+        "NL": "Zorgverzekeringswet",
+        "DE": "Krankenversicherung",
+        "FR": "Assurance maladie",
+        "BE": "Ziekteverzekering",
+        "CH": "Krankenversicherung"
+      },
+      "notes": "Universal in many European countries",
+      "metadata": {
+        "mandatory": true
+      }
+    },
+    {
+      "id": "capital_gains_tax",
+      "name": "Capital Gains Tax",
+      "description": "Tax on profits from the sale of assets or investments",
+      "category": "direct_tax",
+      "subcategories": ["investment_tax"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["US", "GB", "DE", "FR", "ES", "IT"],
+      "not_applicable_in": ["NL", "BE", "CH"],
+      "alternatives": {
+        "US": "Capital Gains Tax",
+        "GB": "Capital Gains Tax",
+        "DE": "Kapitalertragsteuer",
+        "FR": "Impôt sur les plus-values",
+        "ES": "Impuesto sobre las ganancias de capital"
+      },
+      "notes": "NL uses deemed return (Box 3) instead",
+      "metadata": {
+        "typical_rates": {
+          "US": 20,
+          "GB": 20,
+          "DE": 25,
+          "FR": 30,
+          "ES": 23
+        }
+      }
+    },
+    {
+      "id": "wealth_tax",
+      "name": "Wealth Tax",
+      "description": "Annual tax on net worth or total assets",
+      "category": "direct_tax",
+      "subcategories": ["asset_tax"],
+      "parent": null,
+      "children": ["deemed_return_tax"],
+      "applies_in": ["NL", "ES", "NO", "CH"],
+      "not_applicable_in": ["US", "GB", "DE"],
+      "alternatives": {
+        "NL": "Vermogensrendementsheffing (Box 3)",
+        "ES": "Impuesto sobre el Patrimonio",
+        "NO": "Formuesskatt",
+        "CH": "Vermögenssteuer"
+      },
+      "notes": "Rare globally, Netherlands uses deemed return method",
+      "metadata": {
+        "typical_rates": {
+          "NL": 1.89,
+          "ES": 2.5,
+          "NO": 1.1,
+          "CH": 0.5
+        },
+        "filing_frequency": {
+          "NL": "annual",
+          "ES": "annual"
+        }
+      }
+    },
+    {
+      "id": "deemed_return_tax",
+      "name": "Deemed Return Tax",
+      "description": "Tax calculated on assumed (deemed) investment returns rather than actual returns",
+      "category": "calculation_method",
+      "subcategories": ["wealth_tax_method"],
+      "parent": "wealth_tax",
+      "children": [],
+      "applies_in": ["NL"],
+      "not_applicable_in": ["US", "GB", "DE", "FR", "ES"],
+      "alternatives": {
+        "NL": "Vermogensrendementsheffing"
+      },
+      "notes": "Unique to Netherlands Box 3 taxation",
+      "metadata": {
+        "typical_rates": {
+          "NL": 5.88
+        },
+        "mandatory": true,
+        "related_concepts": ["wealth_tax", "box3_tax"]
+      }
+    },
+    {
+      "id": "corporate_tax",
+      "name": "Corporate Income Tax",
+      "description": "Tax on company profits",
+      "category": "direct_tax",
+      "subcategories": ["business_tax"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR", "ES", "IT", "IE"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Vennootschapsbelasting (Vpb)",
+        "US": "Corporate Tax",
+        "GB": "Corporation Tax",
+        "DE": "Körperschaftsteuer",
+        "FR": "Impôt sur les sociétés",
+        "IE": "Corporation Tax"
+      },
+      "notes": "Applies to incorporated entities",
+      "metadata": {
+        "typical_rates": {
+          "NL": 25.8,
+          "US": 21,
+          "GB": 25,
+          "DE": 15,
+          "FR": 25,
+          "IE": 12.5
+        },
+        "filing_frequency": {
+          "NL": "annual",
+          "US": "quarterly"
+        }
+      }
+    },
+    {
+      "id": "inheritance_tax",
+      "name": "Inheritance Tax",
+      "description": "Tax on assets inherited after someone's death",
+      "category": "direct_tax",
+      "subcategories": ["transfer_tax"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "GB", "FR", "ES", "IT", "BE"],
+      "not_applicable_in": ["US", "CA", "AU"],
+      "alternatives": {
+        "NL": "Erfbelasting",
+        "GB": "Inheritance Tax",
+        "FR": "Droits de succession",
+        "ES": "Impuesto de Sucesiones",
+        "IT": "Imposta di successione"
+      },
+      "notes": "US uses estate tax instead",
+      "metadata": {
+        "typical_rates": {
+          "NL": 40,
+          "GB": 40,
+          "FR": 45,
+          "ES": 34
+        },
+        "filing_frequency": {
+          "NL": "on_event",
+          "GB": "on_event"
+        }
+      }
+    },
+    {
+      "id": "gift_tax",
+      "name": "Gift Tax",
+      "description": "Tax on transfers of money or property given as gifts",
+      "category": "direct_tax",
+      "subcategories": ["transfer_tax"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "FR", "ES", "BE"],
+      "not_applicable_in": ["GB", "AU", "CA"],
+      "alternatives": {
+        "NL": "Schenkbelasting",
+        "US": "Gift Tax",
+        "FR": "Droits de donation",
+        "ES": "Impuesto sobre Donaciones"
+      },
+      "notes": "Often has annual exemption limits",
+      "metadata": {
+        "filing_frequency": {
+          "NL": "on_event",
+          "US": "annual"
+        }
+      }
+    },
+    {
+      "id": "property_tax",
+      "name": "Property Tax",
+      "description": "Annual tax on real estate ownership based on property value",
+      "category": "direct_tax",
+      "subcategories": ["local_tax"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "FR", "ES", "IT"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Onroerendezaakbelasting (OZB)",
+        "US": "Property Tax",
+        "GB": "Council Tax",
+        "FR": "Taxe foncière",
+        "ES": "Impuesto sobre Bienes Inmuebles (IBI)"
+      },
+      "notes": "Usually collected by local government",
+      "metadata": {
+        "filing_frequency": {
+          "NL": "annual",
+          "US": "annual",
+          "GB": "annual"
+        }
+      }
+    },
+    {
+      "id": "excise_tax",
+      "name": "Excise Tax",
+      "description": "Tax on specific goods like alcohol, tobacco, fuel",
+      "category": "indirect_tax",
+      "subcategories": ["consumption_tax", "sin_tax"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR", "ES", "IT"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Accijns",
+        "US": "Excise Tax",
+        "GB": "Excise Duty",
+        "DE": "Verbrauchsteuer",
+        "FR": "Accise"
+      },
+      "notes": "Higher rates on alcohol and tobacco"
+    },
+    {
+      "id": "customs_duty",
+      "name": "Customs Duty",
+      "description": "Tax on goods imported from foreign countries",
+      "category": "indirect_tax",
+      "subcategories": ["import_tax"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR", "ES", "IT"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Invoerrechten",
+        "US": "Customs Duty / Tariff",
+        "GB": "Import Duty",
+        "DE": "Zoll",
+        "FR": "Droits de douane"
+      },
+      "notes": "Varies by trade agreements"
+    },
+    {
+      "id": "personal_allowance",
+      "name": "Personal Allowance",
+      "description": "Tax-free amount of income everyone is entitled to",
+      "category": "exemption",
+      "subcategories": ["tax_free_income"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["GB", "DE", "FR", "ES"],
+      "not_applicable_in": ["NL"],
+      "alternatives": {
+        "GB": "Personal Allowance",
+        "DE": "Grundfreibetrag",
+        "FR": "Abattement forfaitaire",
+        "ES": "Mínimo personal"
+      },
+      "notes": "NL uses tax credits instead of allowances",
+      "metadata": {
+        "typical_rates": {
+          "GB": 12570,
+          "DE": 10908,
+          "FR": 10777
+        }
+      }
+    },
+    {
+      "id": "general_tax_credit",
+      "name": "General Tax Credit",
+      "description": "Universal tax credit available to all taxpayers to reduce tax liability",
+      "category": "tax_credit",
+      "subcategories": ["universal_credit"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Algemene heffingskorting"
+      },
+      "notes": "Primary tax reduction mechanism in Netherlands",
+      "metadata": {
+        "typical_rates": {
+          "NL": 3070
+        },
+        "mandatory": true
+      }
+    },
+    {
+      "id": "labor_tax_credit",
+      "name": "Labor Tax Credit",
+      "description": "Tax credit for employment income to encourage workforce participation",
+      "category": "tax_credit",
+      "subcategories": ["employment_credit"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Arbeidskorting"
+      },
+      "notes": "Phases out at higher incomes",
+      "metadata": {
+        "typical_rates": {
+          "NL": 5052
+        }
+      }
+    },
+    {
+      "id": "child_tax_credit",
+      "name": "Child Tax Credit",
+      "description": "Tax credit for families with dependent children",
+      "category": "tax_credit",
+      "subcategories": ["family_credit"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["US", "GB", "DE", "FR", "ES"],
+      "not_applicable_in": ["NL"],
+      "alternatives": {
+        "US": "Child Tax Credit",
+        "GB": "Child Tax Credit",
+        "DE": "Kindergeld",
+        "FR": "Allocations familiales"
+      },
+      "notes": "NL uses separate benefit system (toeslagen)",
+      "metadata": {
+        "typical_rates": {
+          "US": 2000,
+          "GB": 1331,
+          "DE": 2628
+        }
+      }
+    },
+    {
+      "id": "earned_income_credit",
+      "name": "Earned Income Tax Credit",
+      "description": "Refundable tax credit for low to moderate income workers",
+      "category": "tax_credit",
+      "subcategories": ["refundable_credit"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["US"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "US": "Earned Income Tax Credit (EITC)"
+      },
+      "notes": "Can result in tax refund even with no tax liability"
+    },
+    {
+      "id": "mortgage_interest_deduction",
+      "name": "Mortgage Interest Deduction",
+      "description": "Deduction for interest paid on home mortgage loans",
+      "category": "tax_deduction",
+      "subcategories": ["housing_deduction"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US"],
+      "not_applicable_in": ["GB"],
+      "alternatives": {
+        "NL": "Hypotheekrenteaftrek",
+        "US": "Mortgage Interest Deduction"
+      },
+      "notes": "Being phased out in Netherlands",
+      "metadata": {
+        "mandatory": false
+      }
+    },
+    {
+      "id": "business_expenses",
+      "name": "Business Expense Deductions",
+      "description": "Deductions for ordinary and necessary business expenses",
+      "category": "tax_deduction",
+      "subcategories": ["business_deduction"],
+      "parent": null,
+      "children": ["home_office_deduction"],
+      "applies_in": ["NL", "US", "GB", "DE", "FR", "ES"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Aftrekbare kosten",
+        "US": "Business Expenses",
+        "GB": "Allowable Expenses",
+        "DE": "Betriebsausgaben",
+        "FR": "Charges déductibles"
+      },
+      "notes": "Must be documented and business-related"
+    },
+    {
+      "id": "home_office_deduction",
+      "name": "Home Office Deduction",
+      "description": "Deduction for portion of home used exclusively for business",
+      "category": "tax_deduction",
+      "subcategories": ["business_deduction"],
+      "parent": "business_expenses",
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Werkruimte in woning",
+        "US": "Home Office Deduction",
+        "GB": "Working from Home Allowance",
+        "DE": "Häusliches Arbeitszimmer"
+      },
+      "notes": "Strict requirements for qualification"
+    },
+    {
+      "id": "charitable_donations",
+      "name": "Charitable Donation Deduction",
+      "description": "Deduction for donations to qualified charitable organizations",
+      "category": "tax_deduction",
+      "subcategories": ["itemized_deduction"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Giftenaftrek",
+        "US": "Charitable Contribution",
+        "GB": "Gift Aid",
+        "DE": "Spendenabzug",
+        "FR": "Déduction pour dons"
+      },
+      "notes": "Organization must be registered charity"
+    },
+    {
+      "id": "pension_contribution_deduction",
+      "name": "Pension Contribution Deduction",
+      "description": "Deduction for contributions to retirement savings plans",
+      "category": "tax_deduction",
+      "subcategories": ["retirement_deduction"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Pensioenopbouw",
+        "US": "401(k) / IRA Contribution",
+        "GB": "Pension Relief",
+        "DE": "Altersvorsorgeaufwendungen"
+      },
+      "notes": "Often has annual contribution limits"
+    },
+    {
+      "id": "annual_tax_return",
+      "name": "Annual Tax Return",
+      "description": "Yearly filing reporting all income, deductions, and calculating tax due or refund",
+      "category": "filing_requirement",
+      "subcategories": ["mandatory_filing"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR", "ES", "IT"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Aangifte inkomstenbelasting",
+        "US": "Form 1040",
+        "GB": "Self Assessment",
+        "DE": "Einkommensteuererklärung",
+        "FR": "Déclaration de revenus"
+      },
+      "notes": "Deadline varies by country",
+      "metadata": {
+        "filing_frequency": {
+          "NL": "annual",
+          "US": "annual",
+          "GB": "annual"
+        },
+        "mandatory": true
+      }
+    },
+    {
+      "id": "quarterly_vat_return",
+      "name": "Quarterly VAT Return",
+      "description": "Quarterly filing reporting VAT collected and paid",
+      "category": "filing_requirement",
+      "subcategories": ["vat_filing"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "GB", "FR", "ES", "IT"],
+      "not_applicable_in": ["US"],
+      "alternatives": {
+        "NL": "BTW-aangifte",
+        "GB": "VAT Return",
+        "FR": "Déclaration de TVA",
+        "ES": "Declaración de IVA"
+      },
+      "notes": "Some countries allow monthly filing for large businesses",
+      "metadata": {
+        "filing_frequency": {
+          "NL": "quarterly",
+          "GB": "quarterly",
+          "FR": "monthly"
+        },
+        "mandatory": true,
+        "related_concepts": ["vat"]
+      }
+    },
+    {
+      "id": "payroll_tax_return",
+      "name": "Payroll Tax Return",
+      "description": "Regular filing reporting employee wages and withholding taxes",
+      "category": "filing_requirement",
+      "subcategories": ["employer_filing"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Loonheffing aangifte",
+        "US": "Form 941",
+        "GB": "PAYE Return",
+        "DE": "Lohnsteueranmeldung",
+        "FR": "DSN (Déclaration Sociale Nominative)"
+      },
+      "notes": "Usually monthly or quarterly",
+      "metadata": {
+        "filing_frequency": {
+          "NL": "monthly",
+          "US": "quarterly",
+          "GB": "monthly"
+        }
+      }
+    },
+    {
+      "id": "sole_proprietor",
+      "name": "Sole Proprietorship",
+      "description": "Unincorporated business owned by one person",
+      "category": "business_structure",
+      "subcategories": ["unincorporated"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR", "ES"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Eenmanszaak",
+        "US": "Sole Proprietorship",
+        "GB": "Sole Trader",
+        "DE": "Einzelunternehmen",
+        "FR": "Entreprise individuelle",
+        "ES": "Autónomo"
+      },
+      "notes": "Simplest business structure, owner personally liable"
+    },
+    {
+      "id": "partnership",
+      "name": "Partnership",
+      "description": "Business owned by two or more persons",
+      "category": "business_structure",
+      "subcategories": ["unincorporated"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Vennootschap onder firma (VOF)",
+        "US": "Partnership",
+        "GB": "Partnership",
+        "DE": "Personengesellschaft",
+        "FR": "Société en nom collectif (SNC)"
+      },
+      "notes": "Partners share profits and liabilities"
+    },
+    {
+      "id": "limited_liability_company",
+      "name": "Limited Liability Company",
+      "description": "Company where owners have limited personal liability",
+      "category": "business_structure",
+      "subcategories": ["incorporated"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR", "ES"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Besloten Vennootschap (BV)",
+        "US": "LLC",
+        "GB": "Limited Company (Ltd)",
+        "DE": "Gesellschaft mit beschränkter Haftung (GmbH)",
+        "FR": "Société à responsabilité limitée (SARL)",
+        "ES": "Sociedad Limitada (SL)"
+      },
+      "notes": "Most common incorporated structure"
+    },
+    {
+      "id": "corporation",
+      "name": "Corporation",
+      "description": "Incorporated entity separate from its owners",
+      "category": "business_structure",
+      "subcategories": ["incorporated"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Naamloze Vennootschap (NV)",
+        "US": "C-Corporation",
+        "GB": "Public Limited Company (PLC)",
+        "DE": "Aktiengesellschaft (AG)",
+        "FR": "Société Anonyme (SA)"
+      },
+      "notes": "Subject to corporate tax"
+    },
+    {
+      "id": "national_tax_authority",
+      "name": "National Tax Authority",
+      "description": "Government agency responsible for tax collection and enforcement",
+      "category": "tax_authority",
+      "subcategories": ["government_agency"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR", "ES", "IT"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Belastingdienst",
+        "US": "Internal Revenue Service (IRS)",
+        "GB": "His Majesty's Revenue and Customs (HMRC)",
+        "DE": "Finanzamt",
+        "FR": "Direction générale des finances publiques (DGFiP)",
+        "ES": "Agencia Tributaria"
+      },
+      "notes": "Primary tax collection authority in each country"
+    },
+    {
+      "id": "tax_bracket",
+      "name": "Tax Bracket",
+      "description": "Income range taxed at a specific rate in progressive tax systems",
+      "category": "calculation_method",
+      "subcategories": ["progressive_tax"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR", "ES"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Schijf",
+        "US": "Tax Bracket",
+        "GB": "Tax Band",
+        "DE": "Steuerstufe",
+        "FR": "Tranche d'imposition"
+      },
+      "notes": "Only income within each bracket is taxed at that rate"
+    },
+    {
+      "id": "marginal_rate",
+      "name": "Marginal Tax Rate",
+      "description": "Tax rate applied to the last dollar/euro of income",
+      "category": "calculation_method",
+      "subcategories": ["tax_rate"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Marginaal tarief",
+        "US": "Marginal Tax Rate",
+        "GB": "Marginal Rate",
+        "DE": "Grenzsteuersatz",
+        "FR": "Taux marginal d'imposition"
+      },
+      "notes": "Different from effective tax rate"
+    },
+    {
+      "id": "effective_rate",
+      "name": "Effective Tax Rate",
+      "description": "Average rate paid on all income (total tax / total income)",
+      "category": "calculation_method",
+      "subcategories": ["tax_rate"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Gemiddeld tarief",
+        "US": "Effective Tax Rate",
+        "GB": "Effective Rate",
+        "DE": "Durchschnittssteuersatz",
+        "FR": "Taux effectif d'imposition"
+      },
+      "notes": "Always lower than marginal rate in progressive systems"
+    },
+    {
+      "id": "withholding_tax",
+      "name": "Withholding Tax",
+      "description": "Tax deducted at source before payment is received",
+      "category": "calculation_method",
+      "subcategories": ["collection_method"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR", "ES"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Loonheffing / Dividendbelasting",
+        "US": "Withholding Tax",
+        "GB": "PAYE (Pay As You Earn)",
+        "DE": "Quellensteuer",
+        "FR": "Retenue à la source"
+      },
+      "notes": "Common for salaries and dividends"
+    },
+    {
+      "id": "estimated_tax_payment",
+      "name": "Estimated Tax Payment",
+      "description": "Quarterly advance tax payments for self-employed or investment income",
+      "category": "filing_requirement",
+      "subcategories": ["advance_payment"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["US", "GB"],
+      "not_applicable_in": ["NL"],
+      "alternatives": {
+        "US": "Estimated Tax",
+        "GB": "Payment on Account"
+      },
+      "notes": "NL uses provisional assessment instead"
+    },
+    {
+      "id": "provisional_assessment",
+      "name": "Provisional Assessment",
+      "description": "Tax authority's estimate of tax due, adjusted after annual return",
+      "category": "filing_requirement",
+      "subcategories": ["advance_payment"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Voorlopige aanslag"
+      },
+      "notes": "Automatically generated by tax authority"
+    },
+    {
+      "id": "tax_assessment",
+      "name": "Tax Assessment",
+      "description": "Official determination of tax due by tax authority",
+      "category": "filing_requirement",
+      "subcategories": ["official_notice"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Aanslag",
+        "US": "Tax Assessment",
+        "GB": "Tax Assessment",
+        "DE": "Steuerbescheid",
+        "FR": "Avis d'imposition"
+      },
+      "notes": "Can be appealed within deadline"
+    },
+    {
+      "id": "tax_year",
+      "name": "Tax Year",
+      "description": "12-month period for which taxes are calculated",
+      "category": "deadline",
+      "subcategories": ["period"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR", "ES"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Belastingjaar",
+        "US": "Tax Year",
+        "GB": "Tax Year",
+        "DE": "Steuerjahr",
+        "FR": "Année fiscale"
+      },
+      "notes": "May differ from calendar year (e.g., UK: April 6 - April 5)"
+    },
+    {
+      "id": "annual_filing_deadline",
+      "name": "Annual Tax Return Deadline",
+      "description": "Date by which annual tax return must be filed",
+      "category": "deadline",
+      "subcategories": ["filing_deadline"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Aangiftetermijn",
+        "US": "Tax Day (April 15)",
+        "GB": "Self Assessment Deadline (January 31)",
+        "DE": "Abgabefrist",
+        "FR": "Date limite de déclaration"
+      },
+      "notes": "Extensions may be available",
+      "metadata": {
+        "typical_rates": {
+          "NL": "2025-05-01",
+          "US": "2025-04-15",
+          "GB": "2025-01-31"
+        }
+      }
+    },
+    {
+      "id": "late_filing_penalty",
+      "name": "Late Filing Penalty",
+      "description": "Penalty charged for filing tax return after deadline",
+      "category": "deadline",
+      "subcategories": ["penalty"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Vergrijpboete",
+        "US": "Failure to File Penalty",
+        "GB": "Late Filing Penalty",
+        "DE": "Verspätungszuschlag",
+        "FR": "Pénalité de retard"
+      },
+      "notes": "Increases with time"
+    },
+    {
+      "id": "tax_refund",
+      "name": "Tax Refund",
+      "description": "Money returned when tax paid exceeds tax owed",
+      "category": "filing_requirement",
+      "subcategories": ["result"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "US", "GB", "DE", "FR"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Teruggave",
+        "US": "Tax Refund",
+        "GB": "Tax Rebate",
+        "DE": "Steuererstattung",
+        "FR": "Remboursement d'impôt"
+      },
+      "notes": "Usually processed within weeks of filing"
+    },
+    {
+      "id": "small_business_scheme",
+      "name": "Small Business Scheme",
+      "description": "Simplified tax regime for small businesses below revenue threshold",
+      "category": "exemption",
+      "subcategories": ["small_business"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "GB", "FR", "ES"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Kleineondernemersregeling (KOR)",
+        "GB": "Flat Rate Scheme",
+        "FR": "Micro-entreprise",
+        "ES": "Régimen de módulos"
+      },
+      "notes": "Often exempts from VAT or simplifies accounting"
+    },
+    {
+      "id": "dividend_exemption",
+      "name": "Dividend Exemption",
+      "description": "Exemption from tax on dividends to avoid double taxation",
+      "category": "exemption",
+      "subcategories": ["corporate_tax"],
+      "parent": null,
+      "children": [],
+      "applies_in": ["NL", "GB", "FR"],
+      "not_applicable_in": [],
+      "alternatives": {
+        "NL": "Deelnemingsvrijstelling",
+        "GB": "Dividend Allowance",
+        "FR": "Régime mère-fille"
+      },
+      "notes": "Applies to substantial shareholdings"
+    }
+  ]
+}

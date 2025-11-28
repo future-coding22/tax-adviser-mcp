@@ -1,0 +1,586 @@
+{
+  "country": {
+    "code": "NL",
+    "name": "Netherlands",
+    "official_name": "Kingdom of the Netherlands",
+    "language": "nl",
+    "currency": "EUR",
+    "tax_year_start": "01-01",
+    "tax_year_end": "12-31"
+  },
+  "tax_authority": {
+    "name": "Belastingdienst",
+    "official_name": "Belastingdienst",
+    "website": "https://www.belastingdienst.nl",
+    "contact": {
+      "phone": "0800-0543",
+      "email": "via contact form on website",
+      "address": "Belastingdienst, Postbus 9050, 7300 GJ Apeldoorn"
+    },
+    "legal_database": "https://wetten.overheid.nl"
+  },
+  "terms": [
+    {
+      "local_term": "Inkomstenbelasting",
+      "concept_id": "income_tax",
+      "translation": "Income Tax",
+      "full_name": "Inkomstenbelasting",
+      "contextual_meaning": "Annual tax on income from employment, business, home ownership, and investments. Divided into three boxes (Box 1: work and home, Box 2: substantial interest, Box 3: savings and investments).",
+      "search_terms": ["inkomstenbelasting", "IB", "aangifte inkomstenbelasting", "box 1", "box 2", "box 3"],
+      "warnings": [
+        "Netherlands uses a unique 'box system' for categorizing income",
+        "Different tax rules apply to each box",
+        "Box 3 uses deemed return method, not actual investment gains"
+      ],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/home/home"
+    },
+    {
+      "local_term": "Box 1",
+      "concept_id": "income_tax_progressive",
+      "translation": "Box 1 - Income from work and home",
+      "full_name": "Box 1: Inkomen uit werk en woning",
+      "contextual_meaning": "Progressive tax on employment income, business profits, pension income, and benefits from home ownership. Uses tax brackets with rates from 36.93% to 49.50%.",
+      "search_terms": ["box 1", "werk en woning", "loon", "winst", "pensioen"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/box-1/box-1",
+      "current_values": {
+        "brackets_2024": [
+          { "from": 0, "to": 75518, "rate": 36.93 },
+          { "from": 75518, "to": null, "rate": 49.50 }
+        ]
+      }
+    },
+    {
+      "local_term": "Box 2",
+      "concept_id": "capital_gains_tax",
+      "translation": "Box 2 - Income from substantial interest",
+      "full_name": "Box 2: Inkomen uit aanmerkelijk belang",
+      "contextual_meaning": "Tax on dividends and capital gains from substantial shareholdings (generally 5% or more). Flat rate of 26.9%.",
+      "search_terms": ["box 2", "aanmerkelijk belang", "dividenden", "aandelen"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/box-2/box-2",
+      "current_rates": {
+        "standard": 26.9
+      }
+    },
+    {
+      "local_term": "Box 3",
+      "concept_id": "wealth_tax",
+      "translation": "Box 3 - Income from savings and investments",
+      "full_name": "Box 3: Inkomen uit sparen en beleggen",
+      "contextual_meaning": "Tax on net worth (assets minus debts) using deemed return method. Tax is calculated on assumed returns rather than actual gains. Rate is 36% on deemed return.",
+      "search_terms": ["box 3", "sparen en beleggen", "vermogen", "vermogensrendementsheffing"],
+      "warnings": [
+        "Uses deemed return, not actual investment gains",
+        "Tax-free threshold (heffingvrij vermogen) applies",
+        "Different deemed return percentages for different asset brackets"
+      ],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/box-3/box-3",
+      "current_values": {
+        "tax_free_threshold_2024": 57000,
+        "tax_rate": 36,
+        "deemed_return_brackets": [
+          { "from": 0, "to": 57000, "rate": 0 },
+          { "from": 57000, "to": 115000, "rate": 1.90 },
+          { "from": 115000, "to": 1157000, "rate": 5.88 },
+          { "from": 1157000, "to": null, "rate": 6.04 }
+        ]
+      }
+    },
+    {
+      "local_term": "BTW",
+      "concept_id": "vat",
+      "translation": "VAT (Value Added Tax)",
+      "full_name": "Belasting over de Toegevoegde Waarde",
+      "contextual_meaning": "Consumption tax on goods and services. Businesses charge VAT on sales and can deduct VAT paid on purchases. Filed quarterly.",
+      "search_terms": ["BTW", "btw-aangifte", "omzetbelasting", "BTW-nummer"],
+      "warnings": [
+        "Must register for VAT if turnover exceeds €20,000",
+        "Different rates for different goods and services",
+        "Quarterly filing is mandatory for most businesses"
+      ],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/btw",
+      "current_rates": {
+        "standard": 21,
+        "reduced": 9,
+        "zero": 0
+      }
+    },
+    {
+      "local_term": "Kleineondernemersregeling",
+      "concept_id": "small_business_scheme",
+      "translation": "Small Business Scheme",
+      "full_name": "Kleineondernemersregeling (KOR)",
+      "contextual_meaning": "VAT exemption for small businesses with annual turnover below €20,000. Businesses don't charge VAT but also can't deduct input VAT.",
+      "search_terms": ["KOR", "kleineondernemersregeling", "kleine ondernemers regeling"],
+      "warnings": [
+        "Cannot deduct input VAT if using this scheme",
+        "Must stay below €20,000 annual turnover",
+        "Not beneficial if you have high VAT-eligible costs"
+      ],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/ondernemers/content/kleineondernemersregeling-kor"
+    },
+    {
+      "local_term": "AOW",
+      "concept_id": "social_security",
+      "translation": "State Pension (Old Age Pension)",
+      "full_name": "Algemene Ouderdomswet",
+      "contextual_meaning": "Mandatory social security contribution for state pension. Part of national insurance premiums, included in Box 1 tax rates.",
+      "search_terms": ["AOW", "ouderdomswet", "staatspensioen"],
+      "official_page": "https://www.svb.nl/nl/aow"
+    },
+    {
+      "local_term": "ANW",
+      "concept_id": "social_security",
+      "translation": "Surviving Dependents Act",
+      "full_name": "Algemene Nabestaandenwet",
+      "contextual_meaning": "Mandatory contribution for survivors' benefits. Part of national insurance premiums.",
+      "search_terms": ["ANW", "nabestaandenwet", "weduwen pensioen"],
+      "official_page": "https://www.svb.nl/nl/anw"
+    },
+    {
+      "local_term": "Zorgverzekeringswet",
+      "concept_id": "health_insurance_mandatory",
+      "translation": "Healthcare Insurance Act",
+      "full_name": "Zorgverzekeringswet",
+      "contextual_meaning": "Mandatory health insurance for all residents. Employer pays income-dependent contribution (6.68%), individual pays fixed premium to insurer.",
+      "search_terms": ["zorgverzekering", "zvw", "basisverzekering", "health insurance"],
+      "warnings": [
+        "Everyone must have basic health insurance",
+        "Separate employer and employee contributions",
+        "Fines for not having insurance"
+      ],
+      "official_page": "https://www.rijksoverheid.nl/onderwerpen/zorgverzekering",
+      "current_values": {
+        "employer_contribution_rate_2024": 6.68
+      }
+    },
+    {
+      "local_term": "Algemene heffingskorting",
+      "concept_id": "general_tax_credit",
+      "translation": "General Tax Credit",
+      "full_name": "Algemene heffingskorting",
+      "contextual_meaning": "Universal tax credit available to all taxpayers to reduce tax liability. Amount depends on income level.",
+      "search_terms": ["algemene heffingskorting", "heffingskorting", "tax credit"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/heffingskortingen/content/algemene-heffingskorting",
+      "current_values": {
+        "max_amount_2024": 3070
+      }
+    },
+    {
+      "local_term": "Arbeidskorting",
+      "concept_id": "labor_tax_credit",
+      "translation": "Labor Tax Credit",
+      "full_name": "Arbeidskorting",
+      "contextual_meaning": "Tax credit for employment income to encourage workforce participation. Phases out at higher incomes.",
+      "search_terms": ["arbeidskorting", "employment credit", "working credit"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/heffingskortingen/content/arbeidskorting",
+      "current_values": {
+        "max_amount_2024": 5052
+      }
+    },
+    {
+      "local_term": "Zelfstandigenaftrek",
+      "concept_id": "business_expenses",
+      "translation": "Self-Employment Deduction",
+      "full_name": "Zelfstandigenaftrek",
+      "contextual_meaning": "Deduction for self-employed persons who meet the hourly requirement (1,225 hours per year). Being phased out gradually.",
+      "search_terms": ["zelfstandigenaftrek", "ondernemersaftrek", "self-employed deduction"],
+      "warnings": [
+        "Must meet 1,225 hours requirement",
+        "Being phased out (reduced each year)",
+        "Only for sole proprietors (eenmanszaak)"
+      ],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/zelfstandigen/content/zelfstandigenaftrek",
+      "current_values": {
+        "amount_2024": 3750,
+        "required_hours": 1225
+      }
+    },
+    {
+      "local_term": "Startersaftrek",
+      "concept_id": "business_expenses",
+      "translation": "Starter's Deduction",
+      "full_name": "Startersaftrek",
+      "contextual_meaning": "Additional deduction for new entrepreneurs in their first three years of business.",
+      "search_terms": ["startersaftrek", "starter deduction"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/zelfstandigen/content/startersaftrek",
+      "current_values": {
+        "amount_2024": 2123
+      }
+    },
+    {
+      "local_term": "Mkb-winstvrijstelling",
+      "concept_id": "business_expenses",
+      "translation": "SME Profit Exemption",
+      "full_name": "Mkb-winstvrijstelling",
+      "contextual_meaning": "Percentage of business profit that is tax-exempt for small and medium enterprises. Currently 14%.",
+      "search_terms": ["mkb-winstvrijstelling", "winstvrijstelling", "SME exemption"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/zelfstandigen/content/mkb-winstvrijstelling",
+      "current_rates": {
+        "standard": 14
+      }
+    },
+    {
+      "local_term": "Hypotheekrenteaftrek",
+      "concept_id": "mortgage_interest_deduction",
+      "translation": "Mortgage Interest Deduction",
+      "full_name": "Hypotheekrenteaftrek",
+      "contextual_meaning": "Deduction for interest paid on mortgage loans for primary residence. Only available for Box 1 income.",
+      "search_terms": ["hypotheekrenteaftrek", "mortgage deduction", "eigenwoningschuld"],
+      "warnings": [
+        "Only for primary residence (eigenwoningforfait also applies)",
+        "Must be annuity mortgage to qualify",
+        "Being gradually phased out"
+      ],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/koopwoning/content/hoe-werkt-hypotheekrenteaftrek"
+    },
+    {
+      "local_term": "Eigenwoningforfait",
+      "concept_id": "income_tax",
+      "translation": "Imputed Rental Value",
+      "full_name": "Eigenwoningforfait",
+      "contextual_meaning": "Deemed income from home ownership (imputed rent you 'pay yourself'). Added to Box 1 income as taxable benefit.",
+      "search_terms": ["eigenwoningforfait", "imputed rental value"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/koopwoning/content/eigenwoningforfait"
+    },
+    {
+      "local_term": "Giftenaftrek",
+      "concept_id": "charitable_donations",
+      "translation": "Charitable Donation Deduction",
+      "full_name": "Giftenaftrek",
+      "contextual_meaning": "Deduction for donations to recognized charities (ANBI institutions). Minimum threshold applies.",
+      "search_terms": ["giftenaftrek", "ANBI", "donation deduction", "charity"],
+      "warnings": [
+        "Only for recognized charities (ANBI status)",
+        "Minimum threshold of 1% of income (max €60)",
+        "Maximum 10% of income deductible"
+      ],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/aftrek-en-kortingen/content/giften-aftrekken"
+    },
+    {
+      "local_term": "Werkruimte in woning",
+      "concept_id": "home_office_deduction",
+      "translation": "Home Office Deduction",
+      "full_name": "Aftrek werkruimte in eigen woning",
+      "contextual_meaning": "Deduction for portion of home used exclusively for business. Strict requirements apply.",
+      "search_terms": ["werkruimte", "thuiskantoor", "home office"],
+      "warnings": [
+        "Room must be used exclusively for business",
+        "Must be necessary for business operations",
+        "Separate entrance is advantageous"
+      ],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/zelfstandigen/content/ik-heb-een-werkruimte-thuis-wat-kan-ik-aftrekken"
+    },
+    {
+      "local_term": "Aftrekbare kosten",
+      "concept_id": "business_expenses",
+      "translation": "Deductible Business Expenses",
+      "full_name": "Aftrekbare bedrijfskosten",
+      "contextual_meaning": "Business expenses that can be deducted from business income. Must be ordinary, necessary, and documented.",
+      "search_terms": ["aftrekbare kosten", "bedrijfskosten", "business expenses"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/zelfstandigen/content/wat-mag-ik-aftrekken-van-mijn-winst"
+    },
+    {
+      "local_term": "Aangifte inkomstenbelasting",
+      "concept_id": "annual_tax_return",
+      "translation": "Annual Income Tax Return",
+      "full_name": "Aangifte inkomstenbelasting",
+      "contextual_meaning": "Annual filing reporting all income, deductions, and credits. Filed online through MijnBelastingdienst.",
+      "search_terms": ["aangifte", "tax return", "belastingaangifte", "income tax return"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/aangifte/aangifte"
+    },
+    {
+      "local_term": "BTW-aangifte",
+      "concept_id": "quarterly_vat_return",
+      "translation": "VAT Return",
+      "full_name": "BTW-aangifte",
+      "contextual_meaning": "Quarterly (or monthly) filing reporting VAT collected and paid. Filed electronically.",
+      "search_terms": ["btw-aangifte", "vat return", "omzetbelasting aangifte"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/btw/content/btw-aangifte-doen"
+    },
+    {
+      "local_term": "Voorlopige aanslag",
+      "concept_id": "provisional_assessment",
+      "translation": "Provisional Assessment",
+      "full_name": "Voorlopige aanslag",
+      "contextual_meaning": "Estimated tax bill based on expected income. Automatically adjusted after filing annual return.",
+      "search_terms": ["voorlopige aanslag", "provisional assessment"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/betalen/content/voorlopige-aanslag"
+    },
+    {
+      "local_term": "Definitieve aanslag",
+      "concept_id": "tax_assessment",
+      "translation": "Final Assessment",
+      "full_name": "Definitieve aanslag",
+      "contextual_meaning": "Final tax determination after filing annual return. Shows final amount due or refund.",
+      "search_terms": ["definitieve aanslag", "final assessment", "tax assessment"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/betalen/content/ik-heb-een-aanslag-gekregen"
+    },
+    {
+      "local_term": "Teruggave",
+      "concept_id": "tax_refund",
+      "translation": "Tax Refund",
+      "full_name": "Belastingteruggave",
+      "contextual_meaning": "Money returned when taxes paid exceed taxes owed. Processed after final assessment.",
+      "search_terms": ["teruggave", "tax refund", "refund"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/betalen/content/teruggave-belasting"
+    },
+    {
+      "local_term": "Eenmanszaak",
+      "concept_id": "sole_proprietor",
+      "translation": "Sole Proprietorship",
+      "full_name": "Eenmanszaak",
+      "contextual_meaning": "Unincorporated business owned by one person. Simplest business structure. Owner personally liable for all debts.",
+      "search_terms": ["eenmanszaak", "sole proprietor", "zzp", "freelancer"],
+      "official_page": "https://www.kvk.nl/advies-en-informatie/bedrijf-starten/de-onderneming/welke-rechtsvorm-kiest-u/eenmanszaak/"
+    },
+    {
+      "local_term": "VOF",
+      "concept_id": "partnership",
+      "translation": "General Partnership",
+      "full_name": "Vennootschap onder firma",
+      "contextual_meaning": "Partnership of two or more persons. Partners share profits and are jointly liable.",
+      "search_terms": ["VOF", "vennootschap onder firma", "partnership"],
+      "official_page": "https://www.kvk.nl/advies-en-informatie/bedrijf-starten/de-onderneming/welke-rechtsvorm-kiest-u/vennootschap-onder-firma-vof/"
+    },
+    {
+      "local_term": "BV",
+      "concept_id": "limited_liability_company",
+      "translation": "Private Limited Company",
+      "full_name": "Besloten Vennootschap",
+      "contextual_meaning": "Private limited liability company. Most common incorporated structure. Shareholders have limited liability.",
+      "search_terms": ["BV", "besloten vennootschap", "private company"],
+      "official_page": "https://www.kvk.nl/advies-en-informatie/bedrijf-starten/de-onderneming/welke-rechtsvorm-kiest-u/besloten-vennootschap-bv/"
+    },
+    {
+      "local_term": "NV",
+      "concept_id": "corporation",
+      "translation": "Public Limited Company",
+      "full_name": "Naamloze Vennootschap",
+      "contextual_meaning": "Public limited company. Can issue shares publicly. Subject to stricter regulations than BV.",
+      "search_terms": ["NV", "naamloze vennootschap", "public company"],
+      "official_page": "https://www.kvk.nl/advies-en-informatie/bedrijf-starten/de-onderneming/welke-rechtsvorm-kiest-u/naamloze-vennootschap-nv/"
+    },
+    {
+      "local_term": "Vennootschapsbelasting",
+      "concept_id": "corporate_tax",
+      "translation": "Corporate Income Tax",
+      "full_name": "Vennootschapsbelasting (Vpb)",
+      "contextual_meaning": "Tax on company profits for BV and NV entities. Two-tier rate structure.",
+      "search_terms": ["vennootschapsbelasting", "vpb", "corporate tax"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/vennootschapsbelasting/vennootschapsbelasting",
+      "current_values": {
+        "brackets_2024": [
+          { "from": 0, "to": 200000, "rate": 19 },
+          { "from": 200000, "to": null, "rate": 25.8 }
+        ]
+      }
+    },
+    {
+      "local_term": "Loonheffing",
+      "concept_id": "withholding_tax",
+      "translation": "Payroll Tax / Wage Withholding",
+      "full_name": "Loonheffing",
+      "contextual_meaning": "Wage tax withheld at source by employers. Includes income tax and national insurance premiums.",
+      "search_terms": ["loonheffing", "loonbelasting", "payroll tax"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/werkgevers/content/wat-is-loonheffing"
+    },
+    {
+      "local_term": "Dividendbelasting",
+      "concept_id": "withholding_tax",
+      "translation": "Dividend Withholding Tax",
+      "full_name": "Dividendbelasting",
+      "contextual_meaning": "Tax withheld on dividend payments. Rate is 15% for residents (credited against Box 2 tax).",
+      "search_terms": ["dividendbelasting", "dividend tax"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/vennootschapsbelasting/content/dividendbelasting",
+      "current_rates": {
+        "standard": 15
+      }
+    },
+    {
+      "local_term": "Erfbelasting",
+      "concept_id": "inheritance_tax",
+      "translation": "Inheritance Tax",
+      "full_name": "Erfbelasting",
+      "contextual_meaning": "Tax on inherited assets. Rates depend on relationship to deceased and amount inherited.",
+      "search_terms": ["erfbelasting", "inheritance tax", "estate tax"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/erfbelasting/erfbelasting"
+    },
+    {
+      "local_term": "Schenkbelasting",
+      "concept_id": "gift_tax",
+      "translation": "Gift Tax",
+      "full_name": "Schenkbelasting",
+      "contextual_meaning": "Tax on gifts. Annual exemptions apply. Higher exemptions for specific purposes (home purchase, education).",
+      "search_terms": ["schenkbelasting", "gift tax", "donation tax"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/schenken/schenken"
+    },
+    {
+      "local_term": "Onroerendezaakbelasting",
+      "concept_id": "property_tax",
+      "translation": "Property Tax",
+      "full_name": "Onroerendezaakbelasting (OZB)",
+      "contextual_meaning": "Municipal tax on property ownership. Rate varies by municipality.",
+      "search_terms": ["OZB", "onroerendezaakbelasting", "property tax"],
+      "official_page": "https://www.rijksoverheid.nl/onderwerpen/belastingen-voor-werkgevers-en-ondernemers/onroerende-zaakbelasting"
+    },
+    {
+      "local_term": "Accijns",
+      "concept_id": "excise_tax",
+      "translation": "Excise Tax",
+      "full_name": "Accijns",
+      "contextual_meaning": "Excise duty on specific products like alcohol, tobacco, and fuel.",
+      "search_terms": ["accijns", "excise", "excise tax"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/accijns/accijns"
+    },
+    {
+      "local_term": "Invoerrechten",
+      "concept_id": "customs_duty",
+      "translation": "Import Duties",
+      "full_name": "Invoerrechten",
+      "contextual_meaning": "Customs duties on goods imported from outside EU.",
+      "search_terms": ["invoerrechten", "douane", "import duties", "customs"],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/douane/douane"
+    },
+    {
+      "local_term": "Urencriterium",
+      "concept_id": "business_expenses",
+      "translation": "Hours Requirement",
+      "full_name": "Urencriterium",
+      "contextual_meaning": "Requirement to work at least 1,225 hours per year in your business to qualify for self-employment deductions.",
+      "search_terms": ["urencriterium", "1225 uren", "hours requirement"],
+      "warnings": [
+        "Must meet 1,225 hours to qualify for zelfstandigenaftrek",
+        "Hours must be documented",
+        "Failure to meet requirement results in loss of deductions"
+      ],
+      "official_page": "https://www.belastingdienst.nl/wps/wcm/connect/nl/zelfstandigen/content/urencriterium"
+    }
+  ],
+  "calendar": {
+    "tax_year": 2024,
+    "deadlines": [
+      {
+        "name": "Annual Income Tax Return Deadline",
+        "local_name": "Aangifte inkomstenbelasting",
+        "date": "2025-05-01",
+        "type": "filing",
+        "concept_id": "annual_tax_return",
+        "description": "Deadline for filing 2024 income tax return. Extension possible.",
+        "can_extend": true,
+        "extension_deadline": "2025-09-01",
+        "recurrence": "annual"
+      },
+      {
+        "name": "Q1 VAT Return",
+        "local_name": "BTW-aangifte Q1",
+        "date": "2024-04-30",
+        "type": "both",
+        "concept_id": "quarterly_vat_return",
+        "description": "Q1 2024 VAT return and payment deadline",
+        "can_extend": false,
+        "recurrence": "quarterly"
+      },
+      {
+        "name": "Q2 VAT Return",
+        "local_name": "BTW-aangifte Q2",
+        "date": "2024-07-31",
+        "type": "both",
+        "concept_id": "quarterly_vat_return",
+        "description": "Q2 2024 VAT return and payment deadline",
+        "can_extend": false,
+        "recurrence": "quarterly"
+      },
+      {
+        "name": "Q3 VAT Return",
+        "local_name": "BTW-aangifte Q3",
+        "date": "2024-10-31",
+        "type": "both",
+        "concept_id": "quarterly_vat_return",
+        "description": "Q3 2024 VAT return and payment deadline",
+        "can_extend": false,
+        "recurrence": "quarterly"
+      },
+      {
+        "name": "Q4 VAT Return",
+        "local_name": "BTW-aangifte Q4",
+        "date": "2025-01-31",
+        "type": "both",
+        "concept_id": "quarterly_vat_return",
+        "description": "Q4 2024 VAT return and payment deadline",
+        "can_extend": false,
+        "recurrence": "quarterly"
+      },
+      {
+        "name": "Corporate Tax Return",
+        "local_name": "Aangifte vennootschapsbelasting",
+        "date": "2025-06-01",
+        "type": "filing",
+        "concept_id": "corporate_tax",
+        "description": "Corporate tax return for financial year ending 2024",
+        "can_extend": true,
+        "recurrence": "annual"
+      }
+    ]
+  },
+  "business_structures": [
+    {
+      "local_term": "Eenmanszaak",
+      "concept_id": "sole_proprietor",
+      "translation": "Sole Proprietorship",
+      "full_name": "Eenmanszaak",
+      "registration_required": true,
+      "registration_authority": "Kamer van Koophandel (KVK)",
+      "tax_implications": [
+        "Business income taxed as personal income (Box 1)",
+        "Owner personally liable for all business debts",
+        "Eligible for self-employment deductions (zelfstandigenaftrek)",
+        "Must pay income tax and social security contributions",
+        "Can use small business VAT scheme if turnover < €20,000"
+      ]
+    },
+    {
+      "local_term": "VOF",
+      "concept_id": "partnership",
+      "translation": "General Partnership",
+      "full_name": "Vennootschap onder firma",
+      "registration_required": true,
+      "registration_authority": "Kamer van Koophandel (KVK)",
+      "tax_implications": [
+        "Profits divided among partners and taxed as personal income",
+        "Partners jointly and severally liable",
+        "Each partner files separate income tax return",
+        "Partnership itself does not pay income tax"
+      ]
+    },
+    {
+      "local_term": "BV",
+      "concept_id": "limited_liability_company",
+      "translation": "Private Limited Company",
+      "full_name": "Besloten Vennootschap",
+      "registration_required": true,
+      "registration_authority": "Notaris + Kamer van Koophandel (KVK)",
+      "tax_implications": [
+        "Company pays corporate tax (vennootschapsbelasting)",
+        "Shareholders have limited liability",
+        "Dividends taxed at 26.9% (Box 2)",
+        "Salary to director-shareholder taxed as employment income",
+        "More complex administration required"
+      ]
+    },
+    {
+      "local_term": "NV",
+      "concept_id": "corporation",
+      "translation": "Public Limited Company",
+      "full_name": "Naamloze Vennootschap",
+      "registration_required": true,
+      "registration_authority": "Notaris + Kamer van Koophandel (KVK)",
+      "tax_implications": [
+        "Company pays corporate tax (vennootschapsbelasting)",
+        "Can issue shares publicly",
+        "Dividends subject to dividend withholding tax (15%)",
+        "Stricter governance and reporting requirements",
+        "Higher minimum capital requirement"
+      ]
+    }
+  ]
+}
