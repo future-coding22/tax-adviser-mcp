@@ -1498,7 +1498,8 @@ Phase 11 is complete when:
 - [ ] All tools accept country parameter
 - [ ] setup_country autonomous agent works
 - [ ] add_country tool functional
-- [ ] At least 3 countries supported (NL, US, UK)
+- [ ] At least 3 countries supported (NL, RO, SL - Slovenia)
+- [ ] Make it compatbila for EU countries. don't implement any new countries
 - [ ] 90%+ test coverage for new code
 - [ ] Documentation updated
 - [ ] Backward compatibility maintained (NL users unaffected)
