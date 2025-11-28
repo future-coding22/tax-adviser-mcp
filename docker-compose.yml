@@ -29,7 +29,7 @@ services:
       - .env
       
     # Override the Dockerfile's CMD to run in development mode with hot-reloading
-    command: npm run dev
+    command: npm -v
     
     # Keep the container running and allow attaching an interactive shell
     tty: true
