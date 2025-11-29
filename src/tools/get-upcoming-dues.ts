@@ -1,5 +1,5 @@
 import type { ToolHandler, ToolDependencies } from './index.js';
-import type { Config, GetUpcomingDuesInput, GetUpcomingDuesOutput, DuePayment } from '../types/index.js';
+import type { Config, GetUpcomingDuesInput, GetUpcomingDuesOutput, DueItem } from '../types/index.js';
 
 /**
  * Get Upcoming Dues Tool
@@ -37,8 +37,8 @@ export class GetUpcomingDuesTool implements ToolHandler {
     const profile = parsed.profile;
 
     // Get parameters
-    const daysAhead = input.days_ahead || 90;
-    const includeAutopay = input.include_autopay !== false;
+    const daysAhead = input.daysAhead || 90;
+    const includeAutopay = input.includeAutoPay !== false;
     const categoryFilter = input.category;
 
     // Calculate date range
@@ -48,7 +48,7 @@ export class GetUpcomingDuesTool implements ToolHandler {
 
     // Get all recurring payments
     const recurringPayments = profile.recurringPayments || [];
-    const upcomingDues: DuePayment[] = [];
+    const upcomingDues: DueItem[] = [];
 
     for (const payment of recurringPayments) {
       // Filter by auto-pay
@@ -66,14 +66,15 @@ export class GetUpcomingDuesTool implements ToolHandler {
 
       for (const dueDate of nextDueDates) {
         upcomingDues.push({
-          name: payment.name,
-          category: payment.category,
+          id: `${payment.name}-${dueDate.getTime()}`,
+          description: payment.name,
           amount: payment.amount,
           dueDate: this.formatDate(dueDate),
           daysUntil: this.calculateDaysUntil(dueDate, today),
+          category: payment.category === 'tax' ? 'tax' : payment.category === 'insurance' ? 'bill' : 'subscription',
           autoPay: payment.autoPay || false,
-          frequency: payment.frequency,
-          notes: payment.notes,
+          actionRequired: !payment.autoPay,
+          reminderSent: false,
         });
       }
     }
@@ -82,31 +83,18 @@ export class GetUpcomingDuesTool implements ToolHandler {
     upcomingDues.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
 
     // Calculate summary
-    const totalAmount = upcomingDues.reduce((sum, payment) => sum + payment.amount, 0);
-    const byCategory = this.groupByCategory(upcomingDues);
-    const nextDue = upcomingDues[0] || null;
-    const requiresAction = upcomingDues.filter((d) => !d.autoPay && d.daysUntil <= 7);
+    const totalAmount = upcomingDues.reduce((sum, payment) => sum + (typeof payment.amount === 'number' ? payment.amount : 0), 0);
+
+    const autoPayTotal = upcomingDues.filter((d) => d.autoPay).reduce((sum, d) => sum + (typeof d.amount === 'number' ? d.amount : 0), 0);
+    const manualPayTotal = upcomingDues.filter((d) => !d.autoPay).reduce((sum, d) => sum + (typeof d.amount === 'number' ? d.amount : 0), 0);
 
     return {
-      upcoming: upcomingDues,
-      summary: {
-        totalAmount,
-        totalPayments: upcomingDues.length,
-        byCategory,
-        nextDue: nextDue
-          ? {
-              name: nextDue.name,
-              amount: nextDue.amount,
-              dueDate: nextDue.dueDate,
-              daysUntil: nextDue.daysUntil,
-            }
-          : null,
-        requiresAction: requiresAction.map((d) => ({
-          name: d.name,
-          amount: d.amount,
-          dueDate: d.dueDate,
-          daysUntil: d.daysUntil,
-        })),
+      dues: upcomingDues,
+      totals: {
+        fixed: totalAmount,
+        variableEstimated: 0,
+        autoPay: autoPayTotal,
+        manualPay: manualPayTotal,
       },
     };
   }
@@ -180,20 +168,4 @@ export class GetUpcomingDuesTool implements ToolHandler {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
-  /**
-   * Group payments by category
-   */
-  private groupByCategory(payments: DuePayment[]): Record<string, { count: number; total: number }> {
-    const grouped: Record<string, { count: number; total: number }> = {};
-
-    for (const payment of payments) {
-      if (!grouped[payment.category]) {
-        grouped[payment.category] = { count: 0, total: 0 };
-      }
-      grouped[payment.category].count++;
-      grouped[payment.category].total += payment.amount;
-    }
-
-    return grouped;
-  }
 }

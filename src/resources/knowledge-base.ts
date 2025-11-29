@@ -190,7 +190,7 @@ export class KnowledgeBaseResource implements ResourceHandler {
     }));
 
     // Sort by count descending
-    categories.sort((a, b) => b.count - a.count);
+    categories.sort((a, b) => (b.count as number) - (a.count as number));
 
     return {
       uri,

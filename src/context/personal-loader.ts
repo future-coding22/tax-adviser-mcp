@@ -75,7 +75,7 @@ export class PersonalProfileLoader {
   /**
    * Parse basic information section
    */
-  private parseBasicInfo(markdown: string, warnings: string[]): PersonalProfile['basicInfo'] {
+  private parseBasicInfo(markdown: string, _warnings: string[]): PersonalProfile['basicInfo'] {
     const basicInfo: PersonalProfile['basicInfo'] = {
       taxPartner: false,
       thirtyPercentRuling: false,
@@ -108,7 +108,7 @@ export class PersonalProfileLoader {
   /**
    * Parse income section
    */
-  private parseIncome(markdown: string, warnings: string[]): PersonalProfile['income'] {
+  private parseIncome(markdown: string, _warnings: string[]): PersonalProfile['income'] {
     const income: PersonalProfile['income'] = {};
 
     // Employment income
@@ -152,7 +152,7 @@ export class PersonalProfileLoader {
   /**
    * Parse assets section (Box 3)
    */
-  private parseAssets(markdown: string, warnings: string[]): PersonalProfile['assets'] {
+  private parseAssets(markdown: string, _warnings: string[]): PersonalProfile['assets'] {
     const savingsMatch = markdown.match(/\*\*Savings\*\*:\s*€([\d,]+)/);
     const checkingMatch = markdown.match(/\*\*Checking\*\*:\s*~?€([\d,]+)/);
     const stocksMatch = markdown.match(/\*\*Stocks\/ETFs\*\*:\s*€([\d,]+)/);
@@ -177,7 +177,7 @@ export class PersonalProfileLoader {
   /**
    * Parse deductions section
    */
-  private parseDeductions(markdown: string, warnings: string[]): PersonalProfile['deductions'] {
+  private parseDeductions(markdown: string, _warnings: string[]): PersonalProfile['deductions'] {
     const deductions: PersonalProfile['deductions'] = {};
 
     // Mortgage
@@ -221,7 +221,7 @@ export class PersonalProfileLoader {
    * Note: Simplified version - table parsing will be enhanced in Phase 3
    */
   private parseRecurringPayments(
-    markdown: string,
+    _markdown: string,
     warnings: string[]
   ): PersonalProfile['recurringPayments'] {
     warnings.push('Recurring payments parsing is simplified in this version');

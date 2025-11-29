@@ -65,8 +65,8 @@ export class SearchKnowledgeBaseTool implements ToolHandler {
       return {
         query: input.query,
         results: [],
-        count: 0,
-        message: 'Knowledge base is disabled in configuration',
+        totalMatches: 0,
+        categoriesSearched: [],
       };
     }
 
@@ -75,24 +75,24 @@ export class SearchKnowledgeBaseTool implements ToolHandler {
       const searchQuery: KnowledgeSearchQuery = {
         query: input.query,
         category: input.category,
-        taxYear: input.year,
-        tags: input.tags,
-        limit: input.limit || 10,
+        taxYear: input.taxYear,
+        maxResults: input.maxResults || 10,
+        includeExpired: input.includeExpired,
       };
 
       // Search local cache
       const cacheResults = await this.deps.knowledgeCache.searchLocal(searchQuery);
 
       // Filter expired if requested
-      const filteredResults = input.include_expired
+      const filteredResults = input.includeExpired
         ? cacheResults
-        : cacheResults.filter((r) => !r.isExpired);
+        : cacheResults.filter((r: any) => !r.isExpired);
 
       // Sort by relevance score (descending)
-      const sortedResults = filteredResults.sort((a, b) => b.relevanceScore - a.relevanceScore);
+      const sortedResults = filteredResults.sort((a: any, b: any) => b.relevanceScore - a.relevanceScore);
 
       // Format results
-      const results = sortedResults.map((r) => ({
+      const results = sortedResults.map((r: any) => ({
         id: r.id,
         title: r.title,
         summary: r.summary,
@@ -107,46 +107,16 @@ export class SearchKnowledgeBaseTool implements ToolHandler {
         sources: r.sources,
       }));
 
-      // Generate stats
-      const stats = {
-        total_results: results.length,
-        by_category: this.groupByCategory(results),
-        by_confidence: this.groupByConfidence(results),
-        expired_count: results.filter((r) => r.is_expired).length,
-      };
-
       return {
         query: input.query,
         results,
-        count: results.length,
-        stats,
+        totalMatches: results.length,
+        categoriesSearched: input.category ? [input.category] : [],
       };
     } catch (error) {
       throw new Error(
         `Failed to search knowledge base: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
-  }
-
-  /**
-   * Group results by category
-   */
-  private groupByCategory(results: any[]): Record<string, number> {
-    const grouped: Record<string, number> = {};
-    for (const result of results) {
-      grouped[result.category] = (grouped[result.category] || 0) + 1;
-    }
-    return grouped;
-  }
-
-  /**
-   * Group results by confidence level
-   */
-  private groupByConfidence(results: any[]): Record<string, number> {
-    const grouped: Record<string, number> = {};
-    for (const result of results) {
-      grouped[result.confidence] = (grouped[result.confidence] || 0) + 1;
-    }
-    return grouped;
   }
 }

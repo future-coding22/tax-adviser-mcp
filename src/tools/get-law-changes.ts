@@ -1,5 +1,5 @@
 import type { ToolHandler, ToolDependencies } from './index.js';
-import type { Config, GetLawChangesInput, GetLawChangesOutput, TaxLawChange } from '../types/index.js';
+import type { Config, GetLawChangesInput, GetLawChangesOutput, LawChange } from '../types/index.js';
 
 /**
  * Get Tax Law Changes Tool
@@ -47,10 +47,10 @@ export class GetLawChangesTool implements ToolHandler {
   ) {}
 
   async execute(input: GetLawChangesInput): Promise<GetLawChangesOutput> {
-    const fromYear = input.from_year;
-    const toYear = input.to_year || new Date().getFullYear();
+    const fromYear = input.taxYear ? input.taxYear - 1 : new Date().getFullYear() - 1;
+    const toYear = input.taxYear || new Date().getFullYear();
     const category = input.category || 'all';
-    const impactLevel = input.impact_level || 'all';
+    const impactLevel = input.significance || 'all';
 
     if (fromYear >= toYear) {
       throw new Error('from_year must be less than to_year');
@@ -66,129 +66,114 @@ export class GetLawChangesTool implements ToolHandler {
     }
 
     // Otherwise, detect changes from our rules
-    const changes: TaxLawChange[] = [];
+    const changes: LawChange[] = [];
 
     // Only detect changes if we're comparing with our current year
     if (toYear === currentYear || fromYear === currentYear) {
       // Income tax bracket changes
       if (category === 'all' || category === 'income_tax') {
         changes.push({
+          topic: 'Income Tax Bracket Rate for High Earners',
           category: 'income_tax',
-          type: 'rate_change',
-          title: 'Income Tax Bracket Rate for High Earners',
-          description: `Top income tax rate ${fromYear < currentYear ? 'increased' : 'may change'} from 49.50% to current rate`,
-          from_value: fromYear < currentYear ? '49.50%' : 'Unknown',
-          to_value: '49.50%',
-          effective_date: `${toYear}-01-01`,
-          impact_level: 'high',
-          affects_you: this.checkIfAffects('income_tax'),
-          source: 'belastingdienst.nl',
+          oldValue: fromYear < currentYear ? '49.50%' : 'Unknown',
+          newValue: '49.50%',
+          detectedAt: new Date().toISOString(),
+          significance: 'high',
+          affectsProfile: this.checkIfAffects('income_tax'),
+          actionItems: [],
+          sourceEntryId: 'income-tax-rates',
         });
       }
 
       // General tax credit changes
       if (category === 'all' || category === 'credits') {
         changes.push({
+          topic: 'General Tax Credit (Algemene Heffingskorting)',
           category: 'credits',
-          type: 'amount_change',
-          title: 'General Tax Credit (Algemene Heffingskorting)',
-          description: `Maximum general tax credit ${fromYear < currentYear ? 'changed' : 'may change'} to €${currentRules.income_tax.general_credit.max}`,
-          from_value: fromYear < currentYear ? 'Lower amount' : 'Unknown',
-          to_value: `€${currentRules.income_tax.general_credit.max}`,
-          effective_date: `${toYear}-01-01`,
-          impact_level: 'medium',
-          affects_you: this.checkIfAffects('credits'),
-          source: 'belastingdienst.nl',
+          oldValue: fromYear < currentYear ? 'Lower amount' : 'Unknown',
+          newValue: `€${currentRules.income_tax.general_credit.max}`,
+          detectedAt: new Date().toISOString(),
+          significance: 'medium',
+          affectsProfile: this.checkIfAffects('credits'),
+          actionItems: [],
+          sourceEntryId: 'tax-credits',
         });
       }
 
       // Box 3 changes (significant reform in recent years)
       if (category === 'all' || category === 'box3') {
         changes.push({
+          topic: 'Box 3 Deemed Return System',
           category: 'box3',
-          type: 'methodology_change',
-          title: 'Box 3 Deemed Return System',
-          description: 'Box 3 uses actual asset split between savings (1.03%) and investments (6.04%) for deemed returns',
-          from_value: fromYear < currentYear ? 'Old fixed percentages' : 'Unknown',
-          to_value: 'Savings: 1.03%, Investments: 6.04%',
-          effective_date: `${toYear}-01-01`,
-          impact_level: 'high',
-          affects_you: this.checkIfAffects('box3'),
-          source: 'belastingdienst.nl',
-          action_required: this.checkIfAffects('box3')
-            ? 'You must report actual asset allocation in your tax return'
-            : undefined,
+          oldValue: fromYear < currentYear ? 'Old fixed percentages' : 'Unknown',
+          newValue: 'Savings: 1.03%, Investments: 6.04%',
+          detectedAt: new Date().toISOString(),
+          significance: 'high',
+          affectsProfile: this.checkIfAffects('box3'),
+          actionItems: this.checkIfAffects('box3')
+            ? ['You must report actual asset allocation in your tax return']
+            : [],
+          sourceEntryId: 'box3-rules',
         });
       }
 
       // Self-employment deduction changes
       if (category === 'all' || category === 'self_employment') {
         changes.push({
+          topic: 'Self-Employment Deduction (Zelfstandigenaftrek)',
           category: 'self_employment',
-          type: 'amount_change',
-          title: 'Self-Employment Deduction (Zelfstandigenaftrek)',
-          description: `Self-employment deduction ${fromYear < currentYear ? 'changed' : 'is'} to €${currentRules.self_employment.zelfstandigenaftrek.amount}`,
-          from_value: fromYear < currentYear ? 'Different amount' : 'Unknown',
-          to_value: `€${currentRules.self_employment.zelfstandigenaftrek.amount}`,
-          effective_date: `${toYear}-01-01`,
-          impact_level: 'high',
-          affects_you: this.checkIfAffects('self_employment'),
-          source: 'belastingdienst.nl',
+          oldValue: fromYear < currentYear ? 'Different amount' : 'Unknown',
+          newValue: `€${currentRules.self_employment.zelfstandigenaftrek.amount}`,
+          detectedAt: new Date().toISOString(),
+          significance: 'high',
+          affectsProfile: this.checkIfAffects('self_employment'),
+          actionItems: [],
+          sourceEntryId: 'self-employment-deductions',
         });
 
         changes.push({
+          topic: 'SME Profit Exemption (MKB-winstvrijstelling)',
           category: 'self_employment',
-          type: 'rate_change',
-          title: 'SME Profit Exemption (MKB-winstvrijstelling)',
-          description: `SME profit exemption ${fromYear < currentYear ? 'changed' : 'is'} to ${currentRules.self_employment.mkb_vrijstelling.percentage}%`,
-          from_value: fromYear < currentYear ? 'Different percentage' : 'Unknown',
-          to_value: `${currentRules.self_employment.mkb_vrijstelling.percentage}%`,
-          effective_date: `${toYear}-01-01`,
-          impact_level: 'medium',
-          affects_you: this.checkIfAffects('self_employment'),
-          source: 'belastingdienst.nl',
+          oldValue: fromYear < currentYear ? 'Different percentage' : 'Unknown',
+          newValue: `${currentRules.self_employment.mkb_vrijstelling.percentage}%`,
+          detectedAt: new Date().toISOString(),
+          significance: 'medium',
+          affectsProfile: this.checkIfAffects('self_employment'),
+          actionItems: [],
+          sourceEntryId: 'mkb-exemption',
         });
       }
 
       // BTW changes
       if (category === 'all' || category === 'btw') {
         changes.push({
+          topic: 'VAT Standard Rate',
           category: 'btw',
-          type: 'rate_change',
-          title: 'VAT Standard Rate',
-          description: `Standard VAT rate ${fromYear < currentYear ? 'is' : 'remains'} at ${currentRules.btw.standard_rate}%`,
-          from_value: `${currentRules.btw.standard_rate}%`,
-          to_value: `${currentRules.btw.standard_rate}%`,
-          effective_date: `${toYear}-01-01`,
-          impact_level: 'low',
-          affects_you: this.checkIfAffects('btw'),
-          source: 'belastingdienst.nl',
+          oldValue: `${currentRules.btw.standard_rate}%`,
+          newValue: `${currentRules.btw.standard_rate}%`,
+          detectedAt: new Date().toISOString(),
+          significance: 'low',
+          affectsProfile: this.checkIfAffects('btw'),
+          actionItems: [],
+          sourceEntryId: 'btw-rates',
         });
       }
     }
 
     // Filter by impact level
     const filteredChanges =
-      impactLevel === 'all' ? changes : changes.filter((c) => c.impact_level === impactLevel);
+      impactLevel === 'all' ? changes : changes.filter((c) => c.significance === impactLevel);
 
     // Sort by impact level (high -> medium -> low)
     const impactOrder = { high: 0, medium: 1, low: 2 };
     filteredChanges.sort(
-      (a, b) => impactOrder[a.impact_level as keyof typeof impactOrder] - impactOrder[b.impact_level as keyof typeof impactOrder]
+      (a, b) => impactOrder[a.significance as keyof typeof impactOrder] - impactOrder[b.significance as keyof typeof impactOrder]
     );
 
     return {
-      from_year: fromYear,
-      to_year: toYear,
       changes: filteredChanges,
-      total_changes: filteredChanges.length,
-      affects_you_count: filteredChanges.filter((c) => c.affects_you).length,
-      by_category: this.groupByCategory(filteredChanges),
-      by_impact: this.groupByImpact(filteredChanges),
-      requires_action: filteredChanges.filter((c) => c.action_required).map((c) => ({
-        title: c.title,
-        action: c.action_required!,
-      })),
+      summary: `Found ${filteredChanges.length} tax law changes between ${fromYear} and ${toYear}`,
+      lastCheck: new Date().toISOString(),
     };
   }
 
@@ -203,36 +188,27 @@ export class GetLawChangesTool implements ToolHandler {
     try {
       const query = `belastingwijzigingen ${fromYear} ${toYear} ${category !== 'all' ? category : ''} site:belastingdienst.nl OR site:rijksoverheid.nl`;
 
-      const webResults = await this.deps.webSearchService.search({
-        query,
+      const webResults = await this.deps.webSearchService.search(query, {
         maxResults: 10,
-        language: 'nl',
       });
 
       // Parse web results into changes (simplified)
-      const changes: TaxLawChange[] = webResults.results.map((result, index) => ({
+      const changes: LawChange[] = webResults.results.map((result: any, _index: number) => ({
+        topic: result.title,
         category: category !== 'all' ? (category as any) : 'general',
-        type: 'general_change',
-        title: result.title,
-        description: result.snippet,
-        from_value: 'See source',
-        to_value: 'See source',
-        effective_date: `${toYear}-01-01`,
-        impact_level: 'medium',
-        affects_you: false,
-        source: result.url,
+        oldValue: 'See source',
+        newValue: 'See source',
+        detectedAt: new Date().toISOString(),
+        significance: 'medium' as const,
+        affectsProfile: false,
+        actionItems: [],
+        sourceEntryId: result.url,
       }));
 
       return {
-        from_year: fromYear,
-        to_year: toYear,
         changes,
-        total_changes: changes.length,
-        affects_you_count: 0,
-        by_category: this.groupByCategory(changes),
-        by_impact: this.groupByImpact(changes),
-        requires_action: [],
-        note: 'Changes detected from web search. Review sources for detailed information.',
+        summary: `Found ${changes.length} tax law changes from web search. Review sources for detailed information.`,
+        lastCheck: new Date().toISOString(),
       };
     } catch (error) {
       throw new Error(
@@ -271,25 +247,4 @@ export class GetLawChangesTool implements ToolHandler {
     }
   }
 
-  /**
-   * Group changes by category
-   */
-  private groupByCategory(changes: TaxLawChange[]): Record<string, number> {
-    const grouped: Record<string, number> = {};
-    for (const change of changes) {
-      grouped[change.category] = (grouped[change.category] || 0) + 1;
-    }
-    return grouped;
-  }
-
-  /**
-   * Group changes by impact level
-   */
-  private groupByImpact(changes: TaxLawChange[]): Record<string, number> {
-    const grouped: Record<string, number> = {};
-    for (const change of changes) {
-      grouped[change.impact_level] = (grouped[change.impact_level] || 0) + 1;
-    }
-    return grouped;
-  }
 }

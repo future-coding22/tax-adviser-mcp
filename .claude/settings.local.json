@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev)",
+      "*",
+      "Bash(TELEGRAM_BOT_TOKEN=dummy_token TELEGRAM_CHAT_ID=dummy_chat_id npm run dev:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run type-check:*)",
+      "Bash(npx tsc:*)",
+      "Bash(1)",
+      "Bash(cat:*)",
+      "Bash(timeout 3 npm start)",
+      "Bash(npm install:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

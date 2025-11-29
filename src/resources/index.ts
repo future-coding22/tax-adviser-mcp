@@ -1,4 +1,3 @@
-import type { PersonalProfile, DutchTaxRules, KnowledgeStats } from '../types/index.js';
 import { PersonalProfileResource } from './personal-profile.js';
 import { TaxCalendarResource } from './tax-calendar.js';
 import { KnowledgeBaseResource } from './knowledge-base.js';
@@ -31,6 +30,16 @@ export class ResourceRegistry {
    */
   register(prefix: string, handler: ResourceHandler): void {
     this.resources.set(prefix, handler);
+  }
+
+  /**
+   * Set tax rules path for tax calendar resource
+   */
+  setTaxRulesPath(path: string): void {
+    const taxResource = this.resources.get('tax');
+    if (taxResource && 'setTaxRulesPath' in taxResource) {
+      (taxResource as any).setTaxRulesPath(path);
+    }
   }
 
   /**

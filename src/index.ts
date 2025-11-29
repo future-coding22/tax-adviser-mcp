@@ -18,10 +18,33 @@ import { personalProfileLoader } from './context/personal-loader.js';
 import { createDutchTaxKnowledge } from './context/dutch-tax-knowledge.js';
 import { createTaxKnowledgeFactory } from './knowledge/TaxKnowledgeFactory.js';
 import { KnowledgeCacheService } from './services/knowledge-cache.js';
-import { KnowledgeLoader } from './services/knowledge-loader.js';
 import { TelegramService } from './services/telegram.js';
 import { WebSearchService } from './services/web-search.js';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import dotenv from 'dotenv';
+import { existsSync } from 'fs';
+
+// Get the directory of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const PROJECT_ROOT = path.resolve(__dirname, '..');
+
+// Load environment variables from .env file if it exists (silently to avoid MCP protocol interference)
+const envPath = path.join(PROJECT_ROOT, '.env');
+if (existsSync(envPath)) {
+  // Suppress dotenv promotional messages that interfere with MCP JSON-RPC
+  const originalConsoleLog = console.log;
+  console.log = () => {}; // Temporarily disable console.log
+
+  dotenv.config({ path: envPath, override: false });
+
+  console.log = originalConsoleLog; // Restore console.log
+  console.error('✓ Loaded environment variables from .env file');
+} else {
+  console.error('ℹ No .env file found, using system environment variables only');
+}
 
 /**
  * Tax Adviser MCP Server
@@ -56,23 +79,28 @@ class TaxAdviserServer {
    */
   async initialize(): Promise<void> {
     try {
-      // Load configuration
-      this.config = await loadConfig();
+      // Load configuration from project root
+      const configPath = path.join(PROJECT_ROOT, 'data', 'config.yaml');
+      this.config = await loadConfig(configPath);
 
-      // Initialize services
-      const taxKnowledge = createDutchTaxKnowledge(this.config.paths.tax_rules);
+      // Initialize services with paths relative to project root
+      const taxRulesPath = path.isAbsolute(this.config.paths.tax_rules)
+        ? this.config.paths.tax_rules
+        : path.join(PROJECT_ROOT, this.config.paths.tax_rules);
+
+      const knowledgeBasePath = path.isAbsolute(this.config.paths.knowledge_base)
+        ? this.config.paths.knowledge_base
+        : path.join(PROJECT_ROOT, this.config.paths.knowledge_base);
+
+      const taxKnowledge = createDutchTaxKnowledge(taxRulesPath);
       const taxKnowledgeFactory = createTaxKnowledgeFactory({
-        taxRulesDir: path.dirname(this.config.paths.tax_rules),
-        glossaryDir: path.join(process.cwd(), 'knowledge', '_glossary'),
+        taxRulesDir: path.dirname(taxRulesPath),
+        glossaryDir: path.join(PROJECT_ROOT, 'knowledge', '_glossary'),
         defaultCountry: 'NL',
       });
-      const knowledgeLoader = new KnowledgeLoader(this.config.paths.knowledge_base);
-      const knowledgeCache = new KnowledgeCacheService(
-        this.config.paths.knowledge_base,
-        this.config.knowledge
-      );
+      const knowledgeCache = new KnowledgeCacheService(knowledgeBasePath);
       const telegramService = new TelegramService(this.config.telegram);
-      const webSearchService = new WebSearchService(this.config.web_search);
+      const webSearchService = new WebSearchService(this.config.search);
 
       // Initialize knowledge cache
       if (this.config.knowledge.enabled && this.config.knowledge.seed_initial_entries) {
@@ -84,7 +112,6 @@ class TaxAdviserServer {
         personalLoader: personalProfileLoader,
         taxKnowledge, // Legacy Dutch-only (deprecated)
         taxKnowledgeFactory, // New multi-country factory
-        knowledgeLoader,
         knowledgeCache,
         telegramService,
         webSearchService,
@@ -93,10 +120,13 @@ class TaxAdviserServer {
       this.toolRegistry = createToolRegistry(this.config, dependencies);
       this.resourceRegistry = createResourceRegistry();
 
+      // Configure resource paths
+      this.resourceRegistry.setTaxRulesPath(taxRulesPath);
+
       // Set up MCP protocol handlers
       this.setupHandlers();
 
-      console.error('Tax Adviser MCP Server initialized successfully');
+      console.error('✓ Tax Adviser MCP Server initialized successfully');
     } catch (error) {
       console.error('Failed to initialize server:', error);
       throw error;
@@ -318,7 +348,48 @@ Give me actionable recommendations with estimated savings.`,
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
 
-    console.error('Tax Adviser MCP Server running on stdio');
+    console.error('╔════════════════════════════════════════════════════════════════╗');
+    console.error('║          Tax Adviser MCP Server - Running on STDIO            ║');
+    console.error('╚════════════════════════════════════════════════════════════════╝');
+    console.error('');
+    console.error('📋 Server Information:');
+    console.error('   • Transport: STDIO (Standard Input/Output)');
+    console.error('   • Protocol: Model Context Protocol (MCP)');
+    console.error('   • Project Root:', PROJECT_ROOT);
+    console.error('   • Config Path:', path.join(PROJECT_ROOT, 'data', 'config.yaml'));
+    console.error('   • Server Path:', path.resolve(PROJECT_ROOT, 'dist/index.js'));
+    console.error('');
+    console.error('🔧 MCP Client Configuration:');
+    console.error('');
+    console.error('   For Claude Desktop, add this to your config file:');
+    console.error('   macOS: ~/Library/Application Support/Claude/claude_desktop_config.json');
+    console.error('   Windows: %APPDATA%\\Claude\\claude_desktop_config.json');
+    console.error('');
+    console.error('   RECOMMENDED (using node directly):');
+    console.error('   {');
+    console.error('     "mcpServers": {');
+    console.error('       "tax-adviser": {');
+    console.error('         "command": "node",');
+    console.error('         "args": ["' + path.resolve(PROJECT_ROOT, 'dist/index.js') + '"]');
+    console.error('       }');
+    console.error('     }');
+    console.error('   }');
+    console.error('');
+    console.error('   ALTERNATIVE (using npm - requires cwd):');
+    console.error('   {');
+    console.error('     "mcpServers": {');
+    console.error('       "tax-adviser": {');
+    console.error('         "command": "npm",');
+    console.error('         "args": ["start"],');
+    console.error('         "cwd": "' + PROJECT_ROOT + '"');
+    console.error('       }');
+    console.error('     }');
+    console.error('   }');
+    console.error('');
+    console.error('💡 Tip: After updating the config, restart Claude Desktop completely.');
+    console.error('');
+    console.error('✅ Server ready - waiting for MCP client connection...');
+    console.error('');
   }
 
   /**

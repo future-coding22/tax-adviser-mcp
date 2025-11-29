@@ -38,28 +38,24 @@ export class RefreshKnowledgeTool implements ToolHandler {
 
   async execute(input: RefreshKnowledgeInput): Promise<RefreshKnowledgeOutput> {
     if (!this.config.knowledge.enabled) {
-      return {
-        success: false,
-        error: 'Knowledge base is disabled in configuration',
-      };
+      throw new Error('Knowledge base is disabled in configuration');
     }
 
-    const refreshedEntries: any[] = [];
-    const failedEntries: any[] = [];
+    const refreshedDetails: any[] = [];
+    const failedDetails: any[] = [];
 
     try {
       // Scenario 1: Refresh specific entry
-      if (input.id) {
-        const result = await this.refreshEntry(input.id, input.force || false);
+      if (input.entryId) {
+        const result = await this.refreshEntry(input.entryId, false);
         if (result.success) {
-          refreshedEntries.push(result);
+          refreshedDetails.push({ id: result.id, status: 'refreshed' as const });
         } else {
-          failedEntries.push(result);
+          failedDetails.push({ id: result.id, status: 'failed' as const, reason: result.error });
         }
       }
       // Scenario 2: Refresh all expired entries
-      else if (input.refresh_all_expired) {
-        const stats = await this.deps.knowledgeCache.getStats();
+      else if (input.expiredOnly) {
         const allEntries = await this.deps.knowledgeCache.getAllEntries();
 
         const expiredEntries = allEntries.filter((entry: any) => {
@@ -75,9 +71,9 @@ export class RefreshKnowledgeTool implements ToolHandler {
 
           const result = await this.refreshEntry(entry.id, true);
           if (result.success) {
-            refreshedEntries.push(result);
+            refreshedDetails.push({ id: result.id, status: 'refreshed' as const });
           } else {
-            failedEntries.push(result);
+            failedDetails.push({ id: result.id, status: 'failed' as const, reason: result.error });
           }
         }
       }
@@ -89,46 +85,36 @@ export class RefreshKnowledgeTool implements ToolHandler {
         );
 
         for (const entry of categoryEntries) {
-          // Only refresh expired unless force is true
+          // Only refresh expired
           const isExpired = new Date(entry.expiresAt) < new Date();
-          if (!isExpired && !input.force) {
+          if (!isExpired) {
             continue;
           }
 
-          const result = await this.refreshEntry(entry.id, input.force || false);
+          const result = await this.refreshEntry(entry.id, false);
           if (result.success) {
-            refreshedEntries.push(result);
+            refreshedDetails.push({ id: result.id, status: 'refreshed' as const });
           } else {
-            failedEntries.push(result);
+            failedDetails.push({ id: result.id, status: 'failed' as const, reason: result.error });
           }
         }
       } else {
-        return {
-          success: false,
-          error: 'Must specify either id, refresh_all_expired, or category',
-        };
+        throw new Error('Must specify either entryId, expiredOnly, or category');
       }
 
       return {
-        success: true,
-        refreshed_count: refreshedEntries.length,
-        failed_count: failedEntries.length,
-        refreshed_entries: refreshedEntries.map((r) => ({
-          id: r.id,
-          title: r.title,
-          previous_expires_at: r.previousExpiresAt,
-          new_expires_at: r.newExpiresAt,
-        })),
-        failed_entries: failedEntries.map((f) => ({
-          id: f.id,
-          error: f.error,
-        })),
+        refreshed: refreshedDetails.length,
+        failed: failedDetails.length,
+        skipped: 0,
+        details: [
+          ...refreshedDetails,
+          ...failedDetails,
+        ],
       };
     } catch (error) {
-      return {
-        success: false,
-        error: `Failed to refresh knowledge: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      };
+      throw new Error(
+        `Failed to refresh knowledge: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 

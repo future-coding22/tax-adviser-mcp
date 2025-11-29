@@ -107,7 +107,6 @@ export interface ToolDependencies {
   personalLoader: any;
   taxKnowledge: any; // Legacy Dutch-only knowledge (deprecated)
   taxKnowledgeFactory: any; // New multi-country factory
-  knowledgeLoader: any;
   knowledgeCache: any;
   telegramService: any;
   webSearchService: any;

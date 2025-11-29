@@ -69,7 +69,7 @@ export class TelegramService {
    */
   private async sendWithRetry(
     payload: any,
-    priority: 'low' | 'normal' | 'high'
+    _priority: 'low' | 'normal' | 'high'
   ): Promise<SendMessageResult> {
     let lastError: Error | undefined;
 

@@ -113,8 +113,8 @@ export interface SearchResult {
 
 export interface SearchKnowledgeBaseOutput extends KnowledgeSearchResults {}
 
-export interface GetKnowledgeEntryOutput extends KnowledgeEntry {
-  relatedEntries: Array<{
+export interface GetKnowledgeEntryOutput extends Omit<KnowledgeEntry, 'relatedEntries'> {
+  relatedEntries?: Array<{
     id: string;
     title: string;
     category: string;

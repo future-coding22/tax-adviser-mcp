@@ -86,7 +86,7 @@ export class AddCountryTool implements ToolHandler {
   };
 
   constructor(
-    private config: Config,
+    _config: Config,
     private deps: ToolDependencies
   ) {}
 

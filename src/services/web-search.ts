@@ -1,4 +1,3 @@
-import axios, { AxiosInstance } from 'axios';
 import type { SearchConfig } from '../types/index.js';
 
 /**
@@ -6,18 +5,10 @@ import type { SearchConfig } from '../types/index.js';
  */
 export class WebSearchService {
   private readonly config: SearchConfig;
-  private readonly client: AxiosInstance;
   private lastRequestTime: number = 0;
 
   constructor(config: SearchConfig) {
     this.config = config;
-
-    this.client = axios.create({
-      timeout: config.timeout_seconds * 1000,
-      headers: {
-        'User-Agent': config.user_agent,
-      },
-    });
   }
 
   /**
@@ -178,50 +169,6 @@ export class WebSearchService {
    */
   private sleep(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
-  }
-
-  /**
-   * Extract relevant snippet from content
-   */
-  private extractSnippet(content: string, query: string, maxLength = 200): string {
-    // Simple snippet extraction (can be enhanced)
-    const queryLower = query.toLowerCase();
-    const contentLower = content.toLowerCase();
-    const queryIndex = contentLower.indexOf(queryLower);
-
-    if (queryIndex === -1) {
-      // Query not found, return beginning
-      return content.substring(0, maxLength) + '...';
-    }
-
-    // Extract context around query
-    const start = Math.max(0, queryIndex - 50);
-    const end = Math.min(content.length, queryIndex + query.length + 150);
-    let snippet = content.substring(start, end);
-
-    if (start > 0) snippet = '...' + snippet;
-    if (end < content.length) snippet = snippet + '...';
-
-    return snippet;
-  }
-
-  /**
-   * Filter results by age
-   */
-  private filterByAge(results: SearchResult[]): SearchResult[] {
-    if (!this.config.exclude_outdated) {
-      return results;
-    }
-
-    const maxAgeMs = this.config.max_age_days * 24 * 60 * 60 * 1000;
-    const now = Date.now();
-
-    return results.filter((result) => {
-      if (!result.lastUpdated) return true;
-
-      const updateTime = new Date(result.lastUpdated).getTime();
-      return now - updateTime <= maxAgeMs;
-    });
   }
 }
 
