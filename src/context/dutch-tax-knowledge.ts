@@ -38,7 +38,7 @@ export class DutchTaxKnowledge {
    * Get tax year
    */
   getTaxYear(): number {
-    return this.rules.tax_year;
+    return this.rules.taxYear;
   }
 
   /**
@@ -47,7 +47,7 @@ export class DutchTaxKnowledge {
   calculateBox1Tax(taxableIncome: number): number {
     let tax = 0;
 
-    for (const bracket of this.rules.income_tax.box1_brackets) {
+    for (const bracket of this.rules.incomeTax.box1Brackets) {
       if (taxableIncome <= bracket.from) {
         break;
       }
@@ -66,18 +66,15 @@ export class DutchTaxKnowledge {
    * Calculate general tax credit (algemene heffingskorting)
    */
   calculateGeneralCredit(income: number): number {
-    const { max, phase_out_start, phase_out_end, phase_out_rate } =
-      this.rules.income_tax.general_credit;
+    const { max, phaseOutStart, phaseOutRate } =
+      this.rules.incomeTax.generalCredit;
 
-    if (income <= phase_out_start) {
+    if (income <= phaseOutStart) {
       return max;
     }
 
-    if (income >= phase_out_end) {
-      return 0;
-    }
-
-    const reduction = (income - phase_out_start) * (phase_out_rate / 100);
+    // Calculate reduction based on phase-out rate
+    const reduction = (income - phaseOutStart) * (phaseOutRate / 100);
     return Math.max(0, max - reduction);
   }
 
@@ -85,8 +82,8 @@ export class DutchTaxKnowledge {
    * Calculate labor tax credit (arbeidskorting)
    */
   calculateLaborCredit(income: number): number {
-    const { max, brackets, phase_out_start, phase_out_end, phase_out_rate } =
-      this.rules.income_tax.labor_credit;
+    const { max, brackets, phaseOutStart, phaseOutRate } =
+      this.rules.incomeTax.laborCredit;
 
     let credit = 0;
 
@@ -96,27 +93,17 @@ export class DutchTaxKnowledge {
         break;
       }
 
-      if (bracket.type === 'percentage_of_income') {
-        const bracketIncome = Math.min(income, bracket.to || income) - bracket.from;
-        credit += bracketIncome * (bracket.rate / 100);
-      } else if (bracket.type === 'base_plus_percentage') {
-        credit = bracket.base;
-        if (income > bracket.from) {
-          const excess = Math.min(income, bracket.to || income) - bracket.from;
-          credit += excess * (bracket.additional_rate / 100);
-        }
-      } else if (bracket.type === 'fixed') {
-        credit = bracket.amount;
-      }
+      const bracketIncome = Math.min(income, bracket.to || income) - bracket.from;
+      credit += bracketIncome * (bracket.rate / 100);
     }
 
     // Cap at maximum
     credit = Math.min(credit, max);
 
     // Apply phase-out
-    if (income > phase_out_start) {
-      const reduction = Math.min(income, phase_out_end) - phase_out_start;
-      credit = Math.max(0, credit - reduction * (phase_out_rate / 100));
+    if (income > phaseOutStart) {
+      const reduction = (income - phaseOutStart) * (phaseOutRate / 100);
+      credit = Math.max(0, credit - reduction);
     }
 
     return credit;
@@ -132,7 +119,7 @@ export class DutchTaxKnowledge {
     hasPartner: boolean = false
   ): { tax: number; deemedReturn: number; taxableBase: number } {
     const exemption = hasPartner
-      ? this.rules.box3.exemption_partners
+      ? this.rules.box3.exemptionPartners
       : this.rules.box3.exemption;
 
     const netAssets = assets - debts;
@@ -146,20 +133,18 @@ export class DutchTaxKnowledge {
     const savingsAmount = taxableBase * (savingsPercentage / 100);
     const investmentAmount = taxableBase * ((100 - savingsPercentage) / 100);
 
-    // Get deemed return rates
-    const savingsRate = this.rules.box3.deemed_return_categories.find(
-      (c) => c.category === 'savings'
-    )!.rate;
-    const investmentRate = this.rules.box3.deemed_return_categories.find(
-      (c) => c.category === 'investments'
-    )!.rate;
+    // Find the appropriate bracket and get deemed return rates
+    // Using first bracket as default (should be enhanced to handle multiple brackets)
+    const bracket = this.rules.box3.deemedReturnBrackets[0];
+    const savingsRate = bracket.savingsRate;
+    const investmentRate = bracket.investmentRate;
 
     // Calculate deemed return
     const deemedReturn =
       (savingsAmount * savingsRate) / 100 + (investmentAmount * investmentRate) / 100;
 
     // Calculate tax
-    const tax = deemedReturn * (this.rules.box3.tax_rate / 100);
+    const tax = deemedReturn * (this.rules.box3.taxRate / 100);
 
     return { tax, deemedReturn, taxableBase };
   }
@@ -168,38 +153,37 @@ export class DutchTaxKnowledge {
    * Get self-employment deduction amount
    */
   getZelfstandigenaftrek(): number {
-    return this.rules.self_employment.zelfstandigenaftrek.amount;
+    return this.rules.selfEmployment.zelfstandigenaftrek;
   }
 
   /**
    * Get startersaftrek amount
    */
   getStartersaftrek(): number {
-    return this.rules.self_employment.startersaftrek.amount;
+    return this.rules.selfEmployment.startersaftrek;
   }
 
   /**
    * Get MKB-winstvrijstelling percentage
    */
   getMKBVrijstelling(): number {
-    return this.rules.self_employment.mkb_vrijstelling.percentage;
+    return this.rules.selfEmployment.mkbVrijstelling;
   }
 
   /**
    * Get hours requirement for self-employment deductions
    */
   getHoursRequirement(): number {
-    return this.rules.self_employment.hours_requirement.standard;
+    return this.rules.selfEmployment.hoursRequirement;
   }
 
   /**
    * Get BTW rates
    */
-  getBTWRates(): { standard: number; reduced: number; zero: number } {
+  getBTWRates(): { standard: number; reduced: number } {
     return {
-      standard: this.rules.btw.standard_rate,
-      reduced: this.rules.btw.reduced_rate,
-      zero: this.rules.btw.zero_rate,
+      standard: this.rules.btw.standardRate,
+      reduced: this.rules.btw.reducedRate,
     };
   }
 
@@ -207,7 +191,7 @@ export class DutchTaxKnowledge {
    * Get BTW small business threshold (KOR)
    */
   getBTWThreshold(): number {
-    return this.rules.btw.small_business_threshold;
+    return this.rules.btw.smallBusinessThreshold;
   }
 
   /**
@@ -221,7 +205,7 @@ export class DutchTaxKnowledge {
    * Get deduction limits
    */
   getDeductionLimits() {
-    return this.rules.deduction_limits;
+    return this.rules.deductionLimits;
   }
 
   /**
@@ -247,12 +231,12 @@ export class DutchTaxKnowledge {
    * Get tax bracket for income
    */
   getTaxBracket(income: number): { rate: number; from: number; to: number | null } {
-    for (const bracket of this.rules.income_tax.box1_brackets) {
+    for (const bracket of this.rules.incomeTax.box1Brackets) {
       if (income <= (bracket.to || Infinity)) {
         return bracket;
       }
     }
-    return this.rules.income_tax.box1_brackets[this.rules.income_tax.box1_brackets.length - 1];
+    return this.rules.incomeTax.box1Brackets[this.rules.incomeTax.box1Brackets.length - 1];
   }
 
   /**
@@ -269,8 +253,8 @@ export class DutchTaxKnowledge {
   getNextDeadline(): { type: string; date: string } | null {
     const now = new Date();
     const deadlines = [
-      { type: 'Income Tax Filing', date: this.rules.deadlines.income_tax_filing_date },
-      ...this.rules.deadlines.btw_quarterly.map((date, i) => ({
+      { type: 'Income Tax Filing', date: this.rules.deadlines.incomeTaxFiling },
+      ...this.rules.deadlines.btwQuarterly.map((date: string, i: number) => ({
         type: `BTW Q${i + 1}`,
         date,
       })),

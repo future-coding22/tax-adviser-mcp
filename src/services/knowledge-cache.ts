@@ -8,12 +8,8 @@ import type {
   KnowledgeSearchQuery,
   KnowledgeSearchResult,
   CacheOptions,
-  RefreshOptions,
-  RefreshResult,
   DetectedChange,
   KnowledgeStats,
-  ExportOptions,
-  ExportResult,
 } from '../types/index.js';
 
 /**

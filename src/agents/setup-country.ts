@@ -18,7 +18,6 @@ import {
   DiscoveredCountryInfo,
 } from '../types/glossary.js';
 import {
-  validateCountryGlossary,
   safeValidateCountryGlossary,
 } from '../schemas/glossary.js';
 import fs from 'fs/promises';
@@ -45,35 +44,21 @@ export interface SetupCountryConfig {
 }
 
 /**
- * Discovery result for a specific query
- */
-interface DiscoveryResult {
-  query: string;
-  results: string[];
-  confidence: 'high' | 'medium' | 'low';
-  sourceUrls: string[];
-}
-
-/**
  * Autonomous agent for setting up new country support
  */
 export class SetupCountryAgent {
   private webSearch: WebSearchService;
-  private glossary: GlossaryLoader;
   private countryCode: string;
   private countryName: string;
-  private thoroughness: 'quick' | 'medium' | 'thorough';
 
   constructor(
     config: SetupCountryConfig,
     webSearch: WebSearchService,
-    glossary: GlossaryLoader
+    _glossary: GlossaryLoader
   ) {
     this.countryCode = config.countryCode.toUpperCase();
     this.countryName = config.countryName;
-    this.thoroughness = config.thoroughness || 'medium';
     this.webSearch = webSearch;
-    this.glossary = glossary;
   }
 
   /**
@@ -136,7 +121,7 @@ export class SetupCountryAgent {
   private async discoverCountryInfo(): Promise<CountryInfo> {
     // Search for basic country information
     const query = `${this.countryName} ISO country code currency language`;
-    const searchResult = await this.webSearch.search(query, { maxResults: 3 });
+    await this.webSearch.search(query, { maxResults: 3 });
 
     // For now, use reasonable defaults and require manual verification
     // In a production system, this would parse the search results
@@ -156,7 +141,7 @@ export class SetupCountryAgent {
    */
   private async discoverTaxAuthority(): Promise<TaxAuthority> {
     const query = `${this.countryName} tax authority official website`;
-    const searchResult = await this.webSearch.search(query, { maxResults: 5 });
+    await this.webSearch.search(query, { maxResults: 5 });
 
     // Extract authority name and website from results
     // This is simplified - production version would use NLP/parsing
@@ -188,9 +173,6 @@ export class SetupCountryAgent {
       confidence: 'high' | 'medium' | 'low';
       source_url?: string;
     }> = [];
-
-    // Load universal concepts
-    const concepts = await this.glossary.loadConcepts();
 
     // Search for major tax types
     const searchTerms = [
@@ -241,7 +223,7 @@ export class SetupCountryAgent {
 
     // Search for common deadlines
     const query = `${this.countryName} ${new Date().getFullYear()} tax deadlines filing dates`;
-    const searchResult = await this.webSearch.search(query, { maxResults: 5 });
+    await this.webSearch.search(query, { maxResults: 5 });
 
     // Simplified: Create placeholder deadlines
     // Production version would parse dates from search results
@@ -272,7 +254,7 @@ export class SetupCountryAgent {
     }> = [];
 
     const query = `${this.countryName} business structures types LLC corporation sole proprietor`;
-    const searchResult = await this.webSearch.search(query, { maxResults: 5 });
+    await this.webSearch.search(query, { maxResults: 5 });
 
     // Common business structures to check for
     const commonStructures = [

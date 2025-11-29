@@ -48,49 +48,31 @@ export class SendReminderTool implements ToolHandler {
     }
 
     // Check if scheduled
-    const scheduleFor = input.schedule_for ? new Date(input.schedule_for) : null;
+    const scheduleFor = input.schedule ? new Date(input.schedule) : null;
     const now = new Date();
 
     if (scheduleFor && scheduleFor > now) {
       // Schedule for future (would be handled by daemon in production)
       return {
         success: true,
-        message: 'Reminder scheduled successfully',
-        scheduled_for: scheduleFor.toISOString(),
-        details: {
-          message: input.message,
-          priority: input.priority || 'normal',
-          tags: input.tags || [],
-        },
+        scheduledFor: scheduleFor.toISOString(),
       };
     }
 
     // Send immediately
     try {
-      const priority = (input.priority || 'normal') as 'low' | 'normal' | 'high' | 'urgent';
-
-      // Add tags to message if provided
-      let fullMessage = input.message;
-      if (input.tags && input.tags.length > 0) {
-        fullMessage += `\n\n🏷️ Tags: ${input.tags.join(', ')}`;
-      }
+      const priority = (input.priority || 'normal') as 'low' | 'normal' | 'high';
 
       const result = await this.deps.telegramService.sendMessage({
-        message: fullMessage,
+        message: input.message,
         priority,
-        parseMode: 'Markdown',
+        dueId: input.dueId,
       });
 
       if (result.success) {
         return {
           success: true,
-          message: 'Reminder sent successfully',
-          sent_at: now.toISOString(),
-          details: {
-            message: input.message,
-            priority,
-            tags: input.tags || [],
-          },
+          messageId: result.messageId,
         };
       } else {
         return {

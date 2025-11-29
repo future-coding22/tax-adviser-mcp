@@ -4,6 +4,9 @@
   "description": "A Model Context Protocol (MCP) server that acts as a personal tax and financial advisor for Dutch residents",
   "type": "module",
   "main": "dist/index.js",
+  "bin": {
+    "tax-advisor-mcp": "./dist/index.js"
+  },
   "author": "",
   "license": "MIT",
   "keywords": [
@@ -39,6 +42,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
     "axios": "^1.7.9",
+    "dotenv": "^17.2.3",
     "gray-matter": "^4.0.3",
     "marked": "^15.0.6",
     "node-cron": "^3.0.3",

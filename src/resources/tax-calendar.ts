@@ -114,20 +114,20 @@ export class TaxCalendarResource implements ResourceHandler {
           category: 'income-tax',
         },
         {
-          date: deadlines.income_tax_filing,
+          date: deadlines.incomeTaxFiling,
           event: 'Income tax filing deadline',
           description: 'Standard deadline for most taxpayers',
           category: 'income-tax',
           critical: true,
         },
         {
-          date: deadlines.income_tax_extension,
+          date: deadlines.incomeTaxExtension,
           event: 'Income tax extended deadline',
           description: 'Extended deadline if requested before May 1',
           category: 'income-tax',
         },
       ],
-      btw_deadlines: deadlines.btw_quarterly.map((date, index) => ({
+      btw_deadlines: deadlines.btwQuarterly.map((date, index) => ({
         quarter: `Q${index + 1}`,
         deadline: date,
         description: `BTW quarterly filing and payment deadline for Q${index + 1}`,
@@ -135,8 +135,7 @@ export class TaxCalendarResource implements ResourceHandler {
       })),
       provisional_assessment: {
         description: 'Voorlopige aanslag - provisional tax assessments',
-        frequency: deadlines.provisional_assessment.frequency,
-        months: deadlines.provisional_assessment.months,
+        months: deadlines.provisionalAssessment,
       },
       monthly_reminders: [
         {
@@ -169,47 +168,43 @@ export class TaxCalendarResource implements ResourceHandler {
       year,
       income_tax: {
         box1: {
-          brackets: rules.income_tax.box1_brackets.map((b) => ({
+          brackets: rules.incomeTax.box1Brackets.map((b) => ({
             from: taxKnowledge.formatCurrency(b.from),
             to: b.to ? taxKnowledge.formatCurrency(b.to) : 'and above',
             rate: taxKnowledge.formatPercentage(b.rate),
             rate_decimal: b.rate,
           })),
           general_credit: {
-            maximum: taxKnowledge.formatCurrency(rules.income_tax.general_credit.max),
+            maximum: taxKnowledge.formatCurrency(rules.incomeTax.generalCredit.max),
             phase_out_start: taxKnowledge.formatCurrency(
-              rules.income_tax.general_credit.phase_out_start
+              rules.incomeTax.generalCredit.phaseOutStart
             ),
             phase_out_rate: taxKnowledge.formatPercentage(
-              rules.income_tax.general_credit.phase_out_rate
+              rules.incomeTax.generalCredit.phaseOutRate
             ),
           },
           labor_credit: {
-            maximum: taxKnowledge.formatCurrency(rules.income_tax.labor_credit.max),
+            maximum: taxKnowledge.formatCurrency(rules.incomeTax.laborCredit.max),
             description: 'Progressive credit for working income with phase-out',
           },
         },
-        box2: {
-          description: rules.box2.description,
-          threshold: taxKnowledge.formatPercentage(rules.box2.threshold_percentage),
-          rate: taxKnowledge.formatPercentage(rules.box2.tax_rate),
-        },
         box3: {
           exemption_single: taxKnowledge.formatCurrency(rules.box3.exemption),
-          exemption_partners: taxKnowledge.formatCurrency(rules.box3.exemption_partners),
-          deemed_returns: rules.box3.deemed_return_categories.map((c) => ({
-            category: c.category,
-            description: c.description,
-            rate: taxKnowledge.formatPercentage(c.rate),
+          exemption_partners: taxKnowledge.formatCurrency(rules.box3.exemptionPartners),
+          deemed_returns: rules.box3.deemedReturnBrackets.map((c) => ({
+            from: c.from,
+            to: c.to,
+            savings_rate: taxKnowledge.formatPercentage(c.savingsRate),
+            investment_rate: taxKnowledge.formatPercentage(c.investmentRate),
           })),
-          tax_rate: taxKnowledge.formatPercentage(rules.box3.tax_rate),
+          tax_rate: taxKnowledge.formatPercentage(rules.box3.taxRate),
         },
       },
       btw: {
-        standard_rate: taxKnowledge.formatPercentage(rules.btw.standard_rate),
-        reduced_rate: taxKnowledge.formatPercentage(rules.btw.reduced_rate),
-        zero_rate: taxKnowledge.formatPercentage(rules.btw.zero_rate),
-        kor_threshold: taxKnowledge.formatCurrency(rules.btw.small_business_threshold),
+        standard_rate: taxKnowledge.formatPercentage(rules.btw.standardRate),
+        reduced_rate: taxKnowledge.formatPercentage(rules.btw.reducedRate),
+        zero_rate_applies: rules.btw.zeroRateApplies,
+        kor_threshold: taxKnowledge.formatCurrency(rules.btw.smallBusinessThreshold),
       },
     };
 
@@ -234,40 +229,35 @@ export class TaxCalendarResource implements ResourceHandler {
           amount: taxKnowledge.formatCurrency(taxKnowledge.getZelfstandigenaftrek()),
           hours_requirement: taxKnowledge.getHoursRequirement(),
           description: 'Self-employment deduction (being phased out)',
-          phase_out_schedule: rules.self_employment.zelfstandigenaftrek.phase_out_schedule,
         },
         startersaftrek: {
           amount: taxKnowledge.formatCurrency(taxKnowledge.getStartersaftrek()),
           description: 'Additional deduction for first 3 years as entrepreneur',
-          eligibility: rules.self_employment.startersaftrek.eligibility,
         },
         mkb_vrijstelling: {
           percentage: taxKnowledge.formatPercentage(taxKnowledge.getMKBVrijstelling()),
-          description: rules.self_employment.mkb_vrijstelling.description,
+          description: 'SME profit exemption for small and medium-sized businesses',
         },
       },
       other_deductions: {
         gifts: {
-          minimum: taxKnowledge.formatCurrency(rules.deduction_limits.gifts.minimum),
+          minimum: taxKnowledge.formatCurrency(rules.deductionLimits.giftsMinimum),
           maximum_percentage: taxKnowledge.formatPercentage(
-            rules.deduction_limits.gifts.maximum_percentage
+            rules.deductionLimits.giftsMaximumPercentage
           ),
-          requirements: rules.deduction_limits.gifts.requirements,
         },
         medical_expenses: {
           threshold_percentage: taxKnowledge.formatPercentage(
-            rules.deduction_limits.medical_expenses.threshold_percentage
+            rules.deductionLimits.medicalThresholdPercentage
           ),
-          description: rules.deduction_limits.medical_expenses.description,
+          description: 'Medical expenses exceeding threshold percentage of income',
         },
         mortgage_interest: {
-          description: rules.deduction_limits.mortgage_interest.description,
-          requirements: rules.deduction_limits.mortgage_interest.requirements,
+          max_percentage: taxKnowledge.formatPercentage(
+            rules.deductionLimits.mortgageInterestMaxPercentage
+          ),
+          description: 'Mortgage interest deduction for primary residence',
         },
-      },
-      special_rules: {
-        thirty_percent_ruling: rules.special_rules['30_percent_ruling'],
-        tax_partner: rules.special_rules.tax_partner,
       },
     };
 

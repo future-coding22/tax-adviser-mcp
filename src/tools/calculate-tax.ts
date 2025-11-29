@@ -3,7 +3,6 @@ import type {
   Config,
   CalculateTaxEstimateInput,
   CalculateTaxEstimateOutput,
-  TaxCalculationBreakdown,
 } from '../types/index.js';
 
 /**
@@ -21,15 +20,13 @@ export class CalculateTaxEstimateTool implements ToolHandler {
         type: 'number',
         description: 'Tax year to calculate (defaults to current year)',
       },
-      scenario: {
+      incomeOverride: {
         type: 'object',
         description: 'Override income/assets for what-if scenarios',
         properties: {
-          employment_income: { type: 'number' },
-          freelance_income: { type: 'number' },
-          other_income: { type: 'number' },
-          assets: { type: 'number' },
-          debts: { type: 'number' },
+          employment: { type: 'number' },
+          freelance: { type: 'number' },
+          other: { type: 'number' },
         },
       },
     },
@@ -49,21 +46,19 @@ export class CalculateTaxEstimateTool implements ToolHandler {
     const year = input.year || this.config.tax.year || new Date().getFullYear();
 
     // Apply scenario overrides if provided
-    const employmentIncome = input.scenario?.employment_income ?? profile.income.employment ?? 0;
-    const freelanceIncome = input.scenario?.freelance_income ?? profile.income.freelance?.profit ?? 0;
-    const otherIncome = input.scenario?.other_income ?? profile.income.other ?? 0;
+    const employmentIncome = input.incomeOverride?.employment ?? profile.income.employment ?? 0;
+    const freelanceIncome = input.incomeOverride?.freelance ?? profile.income.freelance?.profit ?? 0;
+    const otherIncome = input.incomeOverride?.other ?? profile.income.other ?? 0;
 
     // Calculate assets and debts
     const totalAssets =
-      input.scenario?.assets ??
-      (profile.assets.bankAccounts.savings +
-        profile.assets.bankAccounts.checking +
-        (profile.assets.investments.stocksETFs || 0) +
-        (profile.assets.investments.crypto || 0));
+      profile.assets.bankAccounts.savings +
+      profile.assets.bankAccounts.checking +
+      (profile.assets.investments.stocksETFs || 0) +
+      (profile.assets.investments.crypto || 0);
 
     const totalDebts =
-      input.scenario?.debts ??
-      ((profile.assets.debts.studentLoan || 0) + (profile.assets.debts.personalLoans || 0));
+      (profile.assets.debts.studentLoan || 0) + (profile.assets.debts.personalLoans || 0);
 
     // ===================
     // BOX 1: INCOME TAX
@@ -104,7 +99,6 @@ export class CalculateTaxEstimateTool implements ToolHandler {
     const totalBTW = btwBreakdown.annualLiability;
 
     const totalTaxLiability = totalIncomeTax + box2Tax + totalBox3Tax;
-    const totalIncludingBTW = totalTaxLiability + totalBTW;
 
     // ===================
     // EFFECTIVE TAX RATE
@@ -115,53 +109,56 @@ export class CalculateTaxEstimateTool implements ToolHandler {
       totalIncomeTax
     );
 
-    // ===================
-    // MONTHLY BREAKDOWN
-    // ===================
-    const monthlyBreakdown = {
-      income_tax: totalIncomeTax / 12,
-      box3_tax: totalBox3Tax / 12,
-      btw: totalBTW / 12,
-      total: totalIncludingBTW / 12,
-    };
+    // Build breakdown text summary
+    const breakdownText = `
+Tax Year: ${year}
+Total Tax Liability: €${totalTaxLiability.toFixed(2)}
+Effective Tax Rate: ${effectiveTaxRate.toFixed(2)}%
+
+Box 1 (Income Tax): €${totalIncomeTax.toFixed(2)}
+- Gross Income: €${grossIncome.toFixed(2)}
+- Tax: €${box1Breakdown.grossTax.toFixed(2)}
+- Credits: €${box1Breakdown.totalCredits.toFixed(2)}
+
+Box 3 (Wealth Tax): €${totalBox3Tax.toFixed(2)}
+
+BTW: €${totalBTW.toFixed(2)}/year
+`;
 
     return {
       year,
-      total_tax_liability: totalTaxLiability,
-      total_including_btw: totalIncludingBTW,
-      effective_tax_rate: effectiveTaxRate,
-      breakdown: {
-        box1: {
-          gross_income: grossIncome,
-          taxable_income: box1Breakdown.taxableIncome,
-          gross_tax: box1Breakdown.grossTax,
-          credits: box1Breakdown.totalCredits,
-          deductions: box1Breakdown.totalDeductions,
-          net_tax: box1Breakdown.netTax,
-        },
-        box2: {
-          income: box2Income,
-          tax: box2Tax,
-        },
-        box3: {
-          assets: totalAssets,
-          debts: totalDebts,
-          net_assets: totalAssets - totalDebts,
-          taxable_base: box3Calculation.taxableBase,
-          deemed_return: box3Calculation.deemedReturn,
-          tax: box3Calculation.tax,
-        },
-        btw: btwBreakdown,
+      box1: {
+        grossIncome,
+        deductions: box1Breakdown.deductionsDetail || [],
+        taxableIncome: box1Breakdown.taxableIncome,
+        taxBeforeCredits: box1Breakdown.grossTax,
+        credits: box1Breakdown.creditsDetail || [],
+        taxDue: box1Breakdown.netTax,
       },
-      monthly_breakdown: monthlyBreakdown,
-      credits_applied: box1Breakdown.creditsDetail,
-      deductions_applied: box1Breakdown.deductionsDetail,
-      recommendations: this.generateRecommendations(
-        box1Breakdown,
-        box3Calculation,
-        btwBreakdown,
-        profile
-      ),
+      box2: box2Income > 0 ? {
+        dividendIncome: box2Income,
+        taxDue: box2Tax,
+      } : undefined,
+      box3: totalBox3Tax > 0 ? {
+        assets: totalAssets,
+        debts: totalDebts,
+        netAssets: totalAssets - totalDebts,
+        exemption: box3Calculation.exemption || 0,
+        taxableBase: box3Calculation.taxableBase,
+        deemedReturn: box3Calculation.deemedReturn,
+        taxDue: box3Calculation.tax,
+      } : undefined,
+      btw: btwBreakdown.annualLiability > 0 ? {
+        estimatedRevenue: btwBreakdown.estimatedRevenue,
+        estimatedBTWCollected: btwBreakdown.estimatedBTWCollected,
+        estimatedBTWPaid: btwBreakdown.estimatedBTWPaid,
+        estimatedBTWDue: btwBreakdown.estimatedBTWDue || btwBreakdown.annualLiability,
+      } : undefined,
+      totalEstimatedTax: totalTaxLiability,
+      alreadyPaid: 0,
+      remainingDue: totalTaxLiability,
+      effectiveRate: effectiveTaxRate,
+      breakdown: breakdownText,
     };
   }
 
@@ -318,65 +315,5 @@ export class CalculateTaxEstimateTool implements ToolHandler {
       annualLiability: Math.max(0, annualLiability),
       quarterly: Math.max(0, annualLiability) / 4,
     };
-  }
-
-  /**
-   * Generate tax optimization recommendations
-   */
-  private generateRecommendations(
-    box1: any,
-    box3: any,
-    btw: any,
-    profile: any
-  ): string[] {
-    const recommendations: string[] = [];
-
-    // Self-employment hours requirement
-    if (
-      profile.income.freelance?.registered &&
-      !profile.income.freelance.meetsHoursRequirement
-    ) {
-      recommendations.push(
-        'You may not meet the 1225 hours requirement for zelfstandigenaftrek. Track your hours carefully to claim this €3,750 deduction.'
-      );
-    }
-
-    // Box 3 optimization
-    if (box3.taxableBase > 0 && box3.tax > 1000) {
-      recommendations.push(
-        `Consider using Box 3 debts to reduce wealth tax. Your current Box 3 tax is €${Math.round(box3.tax)}. Mortgage or investment loans can reduce this.`
-      );
-    }
-
-    // BTW small business scheme
-    if (
-      profile.income.freelance?.registered &&
-      !profile.income.freelance.btwNumber &&
-      profile.income.freelance.estimatedAnnualRevenue < 20000
-    ) {
-      recommendations.push(
-        'You may be eligible for the KOR (small business VAT exemption) if your revenue is below €20,000. This can simplify administration.'
-      );
-    }
-
-    // Healthcare deduction threshold
-    const healthcareCosts = profile.deductibleExpenses?.healthcare || 0;
-    if (healthcareCosts > 0) {
-      const threshold = box1.grossIncome * 0.0175; // 1.75% threshold
-      if (healthcareCosts < threshold) {
-        recommendations.push(
-          `Your healthcare costs (€${healthcareCosts}) are below the deduction threshold (€${Math.round(threshold)}). Only costs above this threshold are deductible.`
-        );
-      }
-    }
-
-    // General savings tip
-    if (box1.effectiveTaxRate > 40) {
-      recommendations.push(
-        'Your effective tax rate is high. Consider maximizing pension contributions and other deductions to reduce taxable income.'
-      );
-    }
-
-    return recommendations;
   }
 }

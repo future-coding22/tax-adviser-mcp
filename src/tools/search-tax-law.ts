@@ -3,6 +3,7 @@ import type {
   Config,
   SearchDutchTaxLawInput,
   SearchDutchTaxLawOutput,
+  SearchResult,
   KnowledgeSearchQuery,
 } from '../types/index.js';
 
@@ -54,25 +55,19 @@ export class SearchDutchTaxLawTool implements ToolHandler {
 
   async execute(input: SearchDutchTaxLawInput): Promise<SearchDutchTaxLawOutput> {
     const query = input.query;
-    const category = input.category || 'general';
-    const year = input.year || this.config.tax.year || new Date().getFullYear();
-    const forceRefresh = input.force_refresh || false;
+    const forceRefresh = input.forceRefresh || false;
 
     // Step 1: Search local cache first (unless force_refresh)
     let cacheResults: any[] = [];
-    let usedCache = false;
 
     if (!forceRefresh && this.config.knowledge.enabled) {
       try {
         const searchQuery: KnowledgeSearchQuery = {
           query,
-          category,
-          taxYear: year,
-          limit: 5,
+          maxResults: 5,
         };
 
         cacheResults = await this.deps.knowledgeCache.searchLocal(searchQuery);
-        usedCache = cacheResults.length > 0;
 
         // Filter out expired entries
         const validResults = cacheResults.filter((r) => !r.isExpired);
@@ -80,20 +75,16 @@ export class SearchDutchTaxLawTool implements ToolHandler {
         if (validResults.length > 0) {
           // Found valid cached results - return them
           return {
-            query,
-            category,
-            year,
-            source: 'cache',
-            results: validResults.map((r) => ({
-              id: r.id,
+            results: validResults.map((r: any) => ({
               title: r.title,
-              summary: r.summary,
-              relevance_score: r.relevanceScore,
-              cached_at: r.cachedAt,
-              expires_at: r.expiresAt,
+              source: r.sources?.[0] || 'cache',
+              url: r.sources?.[0] || '',
+              snippet: r.summary,
+              relevance: r.relevanceScore,
             })),
-            count: validResults.length,
-            cache_hit: true,
+            fromCache: true,
+            cacheId: validResults[0]?.id,
+            disclaimer: 'Information from cached knowledge base. Tax laws may have changed.',
           };
         }
       } catch (error) {
@@ -104,138 +95,30 @@ export class SearchDutchTaxLawTool implements ToolHandler {
 
     // Step 2: No valid cache results - search the web
     try {
-      const webQuery = this.buildWebQuery(query, category, year);
-      const webResults = await this.deps.webSearchService.search({
-        query: webQuery,
-        maxResults: 5,
-        language: 'nl',
+      const webQuery = query + ' site:belastingdienst.nl OR site:wetten.nl OR site:rijksoverheid.nl';
+      const webResults = await this.deps.webSearchService.search(webQuery, {
+        maxResults: input.maxResults || 5,
       });
 
-      // Step 3: Cache the web results if auto_cache is enabled
-      const results: any[] = [];
-
-      for (const webResult of webResults.results) {
-        // Prepare result
-        const result = {
-          title: webResult.title,
-          summary: webResult.snippet,
-          url: webResult.url,
-          source: webResult.source,
-          relevance_score: webResult.score || 0.5,
-        };
-
-        results.push(result);
-
-        // Cache if enabled
-        if (this.config.knowledge.auto_cache) {
-          try {
-            const cacheResult = await this.deps.knowledgeCache.cacheEntry({
-              query,
-              content: webResult.content || webResult.snippet,
-              summary: webResult.snippet,
-              sources: [webResult.url],
-              category,
-              taxYear: year,
-              confidence: this.assessConfidence(webResult),
-              tags: this.extractTags(query, category),
-            });
-
-            if (cacheResult.success) {
-              result.cached_id = cacheResult.entry?.id;
-            }
-          } catch (error) {
-            console.error('Failed to cache web result:', error);
-          }
-        }
-      }
+      // Step 3: Format results
+      const results: SearchResult[] = webResults.results.map((r: any) => ({
+        title: r.title,
+        source: r.source,
+        url: r.url,
+        snippet: r.snippet,
+        relevance: r.relevance,
+        lastUpdated: r.lastUpdated,
+      }));
 
       return {
-        query,
-        category,
-        year,
-        source: 'web',
         results,
-        count: results.length,
-        cache_hit: false,
-        searched_sites: webResults.searchedSites || [],
+        fromCache: false,
+        disclaimer: 'Information from web search. Always verify with official tax authorities.',
       };
     } catch (error) {
       throw new Error(
         `Failed to search Dutch tax law: ${error instanceof Error ? error.message : 'Unknown error'}`
       );
     }
-  }
-
-  /**
-   * Build optimized web search query
-   */
-  private buildWebQuery(query: string, category: string, year: number): string {
-    const categoryTerms: Record<string, string> = {
-      income_tax: 'inkomstenbelasting',
-      btw: 'BTW omzetbelasting',
-      box3: 'box 3 vermogensrendementsheffing',
-      self_employment: 'zelfstandig ondernemer',
-      deductions: 'aftrekposten',
-      credits: 'heffingskorting',
-      deadlines: 'aangifte deadline',
-      general: 'belastingdienst',
-    };
-
-    const categoryTerm = categoryTerms[category] || '';
-    const siteRestriction = 'site:belastingdienst.nl OR site:rijksoverheid.nl OR site:government.nl';
-
-    return `${query} ${categoryTerm} ${year} ${siteRestriction}`;
-  }
-
-  /**
-   * Assess confidence level of web result
-   */
-  private assessConfidence(result: any): 'low' | 'medium' | 'high' {
-    const source = result.source?.toLowerCase() || result.url?.toLowerCase() || '';
-
-    // Official government sources = high confidence
-    if (source.includes('belastingdienst.nl') || source.includes('rijksoverheid.nl')) {
-      return 'high';
-    }
-
-    // Other .nl domains = medium confidence
-    if (source.includes('.nl')) {
-      return 'medium';
-    }
-
-    // Other sources = low confidence
-    return 'low';
-  }
-
-  /**
-   * Extract relevant tags from query and category
-   */
-  private extractTags(query: string, category: string): string[] {
-    const tags: string[] = [category];
-
-    // Common tax terms
-    const taxTerms = [
-      'box1',
-      'box2',
-      'box3',
-      'btw',
-      'vat',
-      'aftrek',
-      'korting',
-      'aangifte',
-      'zelfstandig',
-      'freelance',
-      'hypotheek',
-      'vermogen',
-    ];
-
-    const lowerQuery = query.toLowerCase();
-    for (const term of taxTerms) {
-      if (lowerQuery.includes(term)) {
-        tags.push(term);
-      }
-    }
-
-    return [...new Set(tags)]; // Remove duplicates
   }
 }

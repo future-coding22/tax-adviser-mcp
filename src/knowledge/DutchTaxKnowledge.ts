@@ -46,20 +46,20 @@ export class DutchTaxKnowledge implements ITaxKnowledge {
     return await this.glossary.getTaxAuthority(this.countryCode);
   }
 
-  async getIncomeTaxBrackets(year: number): Promise<TaxBracket[]> {
+  async getIncomeTaxBrackets(_year: number): Promise<TaxBracket[]> {
     const rules = this.legacy.getRules();
-    return rules.income_tax.box1_brackets.map(bracket => ({
+    return rules.incomeTax.box1Brackets.map(bracket => ({
       from: bracket.from,
       to: bracket.to,
       rate: bracket.rate,
     }));
   }
 
-  async calculateIncomeTax(income: number, year: number): Promise<number> {
+  async calculateIncomeTax(income: number, _year: number): Promise<number> {
     return this.legacy.calculateBox1Tax(income);
   }
 
-  async getTaxCredits(profile: PersonalTaxProfile, year: number): Promise<TaxCredit[]> {
+  async getTaxCredits(profile: PersonalTaxProfile, _year: number): Promise<TaxCredit[]> {
     const credits: TaxCredit[] = [];
     const totalIncome = (profile.employmentIncome || 0) + (profile.businessIncome || 0);
 
@@ -91,7 +91,7 @@ export class DutchTaxKnowledge implements ITaxKnowledge {
     return credits;
   }
 
-  async getTaxDeductions(profile: PersonalTaxProfile, year: number): Promise<Deduction[]> {
+  async getTaxDeductions(profile: PersonalTaxProfile, _year: number): Promise<Deduction[]> {
     const deductions: Deduction[] = [];
 
     // Self-employment deductions
@@ -130,11 +130,7 @@ export class DutchTaxKnowledge implements ITaxKnowledge {
 
     // Mortgage interest deduction
     if (profile.homeOwnership?.mortgageInterest) {
-      const limits = this.legacy.getDeductionLimits();
-      const deductibleInterest = Math.min(
-        profile.homeOwnership.mortgageInterest,
-        limits.mortgage_interest?.max || profile.homeOwnership.mortgageInterest
-      );
+      const deductibleInterest = profile.homeOwnership.mortgageInterest;
       if (deductibleInterest > 0) {
         deductions.push({
           name: 'Hypotheekrenteaftrek',
@@ -205,26 +201,26 @@ export class DutchTaxKnowledge implements ITaxKnowledge {
     };
   }
 
-  async getVATRates(year: number): Promise<VATRates> {
+  async getVATRates(_year: number): Promise<VATRates> {
     const rates = this.legacy.getBTWRates();
     return {
       standard: rates.standard,
       reduced: rates.reduced,
-      zero: rates.zero,
+      zero: 0, // BTW zero rate (certain exports and international services)
     };
   }
 
   async calculateVAT(
     amount: number,
     rate: 'standard' | 'reduced' | 'zero',
-    year: number
+    _year: number
   ): Promise<number> {
-    const rates = await this.getVATRates(year);
+    const rates = await this.getVATRates(_year);
     const vatRate = rates[rate];
     return (amount * vatRate) / (100 + vatRate);
   }
 
-  async getSelfEmploymentRules(year: number): Promise<SelfEmploymentRules> {
+  async getSelfEmploymentRules(_year: number): Promise<SelfEmploymentRules> {
     const zelfstandigenaftrek = this.legacy.getZelfstandigenaftrek();
     const startersaftrek = this.legacy.getStartersaftrek();
     const hoursRequirement = this.legacy.getHoursRequirement();
@@ -256,7 +252,7 @@ export class DutchTaxKnowledge implements ITaxKnowledge {
     };
   }
 
-  async getTaxObligations(profile: PersonalTaxProfile, year: number): Promise<TaxObligation[]> {
+  async getTaxObligations(profile: PersonalTaxProfile, _year: number): Promise<TaxObligation[]> {
     const obligations: TaxObligation[] = [];
     const glossary = await this.glossary.loadCountryGlossary(this.countryCode);
     const deadlines = glossary.calendar?.deadlines || [];
@@ -280,7 +276,7 @@ export class DutchTaxKnowledge implements ITaxKnowledge {
         description: 'Quarterly VAT return',
         applicable: true,
         deadlines: deadlines.filter(d => d.concept_id === 'quarterly_vat_return'),
-        rates: await this.getVATRates(year),
+        rates: await this.getVATRates(_year),
       });
     }
 
@@ -307,7 +303,7 @@ export class DutchTaxKnowledge implements ITaxKnowledge {
     return obligations;
   }
 
-  async getTaxDeadlines(year: number): Promise<TaxDeadline[]> {
+  async getTaxDeadlines(_year: number): Promise<TaxDeadline[]> {
     const glossary = await this.glossary.loadCountryGlossary(this.countryCode);
     return glossary.calendar?.deadlines || [];
   }
@@ -369,9 +365,9 @@ export class DutchTaxKnowledge implements ITaxKnowledge {
   async estimateTaxRefund(
     profile: PersonalTaxProfile,
     taxesPaid: number,
-    year: number
+    _year: number
   ): Promise<{ refund: number; payment: number; net: number }> {
-    const calculation = await this.calculateTotalTax(profile, year);
+    const calculation = await this.calculateTotalTax(profile, _year);
     const difference = taxesPaid - calculation.totalTax;
 
     return {
@@ -381,9 +377,8 @@ export class DutchTaxKnowledge implements ITaxKnowledge {
     };
   }
 
-  async getTaxPlanningSuggestions(profile: PersonalTaxProfile, year: number): Promise<string[]> {
+  async getTaxPlanningSuggestions(profile: PersonalTaxProfile, _year: number): Promise<string[]> {
     const suggestions: string[] = [];
-    const totalIncome = (profile.employmentIncome || 0) + (profile.businessIncome || 0);
 
     // Self-employment hours
     if (profile.selfEmployed && profile.businessHours && profile.businessHours < 1225) {
@@ -411,7 +406,7 @@ export class DutchTaxKnowledge implements ITaxKnowledge {
     }
 
     // High effective rate
-    const calculation = await this.calculateTotalTax(profile, year);
+    const calculation = await this.calculateTotalTax(profile, _year);
     if (calculation.effectiveRate > 40) {
       suggestions.push(
         `Your effective tax rate is ${calculation.effectiveRate.toFixed(1)}%. Consider maximizing pension contributions and business deductions to reduce taxable income.`

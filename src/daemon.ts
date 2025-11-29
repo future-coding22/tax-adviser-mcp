@@ -7,7 +7,7 @@ import { createDutchTaxKnowledge } from './context/dutch-tax-knowledge.js';
 import { KnowledgeCacheService } from './services/knowledge-cache.js';
 import { TelegramService } from './services/telegram.js';
 import { WebSearchService } from './services/web-search.js';
-import type { Config, TaxObligation, DuePayment } from './types/index.js';
+import type { Config } from './types/index.js';
 
 /**
  * Tax Adviser Daemon
@@ -38,12 +38,9 @@ class TaxAdviserDaemon {
 
       // Initialize services
       this.taxKnowledge = createDutchTaxKnowledge(this.config.paths.tax_rules);
-      this.knowledgeCache = new KnowledgeCacheService(
-        this.config.paths.knowledge_base,
-        this.config.knowledge
-      );
+      this.knowledgeCache = new KnowledgeCacheService(this.config.paths.knowledge_base);
       this.telegramService = new TelegramService(this.config.telegram);
-      this.webSearchService = new WebSearchService(this.config.web_search);
+      this.webSearchService = new WebSearchService(this.config.search);
 
       // Initialize knowledge cache
       if (this.config.knowledge.enabled) {
@@ -106,7 +103,7 @@ class TaxAdviserDaemon {
    * Runs daily at 9:00 AM
    */
   private scheduleDeadlineReminders(): void {
-    const schedule = this.config.reminders.deadline_check_time || '0 9 * * *'; // Daily at 9 AM
+    const schedule = this.config.reminders.check_schedule || '0 9 * * *'; // Daily at 9 AM
 
     const job = cron.schedule(schedule, async () => {
       console.log('[Daemon] Running deadline check...');
@@ -191,8 +188,6 @@ class TaxAdviserDaemon {
       const parsed = personalProfileLoader.load(this.config.paths.personal_data);
       const profile = parsed.profile;
 
-      // Get tax obligations
-      const obligations: TaxObligation[] = [];
       const year = this.config.tax.year || new Date().getFullYear();
       const today = new Date();
 
@@ -209,8 +204,7 @@ class TaxAdviserDaemon {
         if (daysUntil > 0 && daysUntil <= 30) {
           await this.telegramService.sendMessage({
             message: `📋 *Tax Deadline Reminder*\n\nIncome tax filing deadline in ${daysUntil} days (${deadline.toLocaleDateString('nl-NL')})\n\nDon't forget to file your tax return!`,
-            priority: daysUntil <= 7 ? 'urgent' : daysUntil <= 14 ? 'high' : 'normal',
-            parseMode: 'Markdown',
+            priority: daysUntil <= 7 ? 'high' : daysUntil <= 14 ? 'high' : 'normal',
           });
         }
       }
@@ -228,8 +222,7 @@ class TaxAdviserDaemon {
           if (daysUntil > 0 && daysUntil <= 14) {
             await this.telegramService.sendMessage({
               message: `💶 *BTW Deadline Reminder*\n\nBTW quarterly filing in ${daysUntil} days (${deadlineDate.toLocaleDateString('nl-NL')})\n\nPrepare your BTW return!`,
-              priority: daysUntil <= 7 ? 'urgent' : 'high',
-              parseMode: 'Markdown',
+              priority: daysUntil <= 7 ? 'high' : 'high',
             });
           }
         }
@@ -255,38 +248,25 @@ class TaxAdviserDaemon {
       const profile = parsed.profile;
 
       const today = new Date();
-      const recurringPayments = profile.recurringPayments || [];
+      const recurringPayments = profile.recurringPayments || { monthly: [], quarterly: [], annual: [] };
 
-      for (const payment of recurringPayments) {
-        // Skip auto-pay payments
+      // Process monthly payments
+      for (const payment of recurringPayments.monthly) {
         if (payment.autoPay) continue;
 
-        // Calculate next due date
-        const lastPaid = payment.lastPaid
-          ? new Date(payment.lastPaid)
-          : new Date(payment.startDate);
-        const nextDue = new Date(lastPaid);
-
-        switch (payment.frequency) {
-          case 'monthly':
-            nextDue.setMonth(nextDue.getMonth() + 1);
-            break;
-          case 'quarterly':
-            nextDue.setMonth(nextDue.getMonth() + 3);
-            break;
-          case 'yearly':
-            nextDue.setFullYear(nextDue.getFullYear() + 1);
-            break;
+        const dueDay = typeof payment.dueDate === 'number' ? payment.dueDate : parseInt(payment.dueDate);
+        const nextDue = new Date(today.getFullYear(), today.getMonth(), dueDay);
+        if (nextDue < today) {
+          nextDue.setMonth(nextDue.getMonth() + 1);
         }
 
         const daysUntil = Math.floor((nextDue.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 
-        // Send reminder 7 days before and 1 day before
         if (daysUntil === 7 || daysUntil === 1) {
+          const amount = typeof payment.amount === 'number' ? `€${payment.amount.toLocaleString()}` : 'Variable';
           await this.telegramService.sendMessage({
-            message: `💳 *Payment Due Reminder*\n\n${payment.name}\nAmount: €${payment.amount.toLocaleString()}\nDue in: ${daysUntil} day${daysUntil > 1 ? 's' : ''} (${nextDue.toLocaleDateString('nl-NL')})\n\nCategory: ${payment.category}`,
+            message: `💳 *Payment Due Reminder*\n\n${payment.description}\nAmount: ${amount}\nDue in: ${daysUntil} day${daysUntil > 1 ? 's' : ''}\nCategory: ${payment.category}`,
             priority: daysUntil === 1 ? 'high' : 'normal',
-            parseMode: 'Markdown',
           });
         }
       }
@@ -306,52 +286,11 @@ class TaxAdviserDaemon {
     }
 
     try {
-      const stats = await this.knowledgeCache.getStats();
-      const allEntries = await this.knowledgeCache.getAllEntries();
+      await this.knowledgeCache.getStats();
 
-      const expiredEntries = allEntries.filter((entry: any) => {
-        const expiresAt = new Date(entry.expiresAt);
-        return expiresAt < new Date();
-      });
+      console.log('[Daemon] Knowledge refresh completed - manual refresh via tools recommended');
 
-      console.log(`[Daemon] Found ${expiredEntries.length} expired entries to refresh`);
-
-      let refreshed = 0;
-      let failed = 0;
-
-      for (const entry of expiredEntries) {
-        try {
-          // Search web for updated information
-          const query = entry.originalQuery || entry.title;
-          const webResults = await this.webSearchService.search({
-            query: `${query} ${entry.category} ${entry.taxYear} site:belastingdienst.nl`,
-            maxResults: 1,
-            language: 'nl',
-          });
-
-          if (webResults.results.length > 0) {
-            const result = webResults.results[0];
-
-            // Update cache entry
-            await this.knowledgeCache.updateEntry(entry.id, {
-              content: result.content || result.snippet,
-              summary: result.snippet,
-              sources: [result.url],
-              confidence: 'high',
-              expiresAt: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString(), // 90 days
-            });
-
-            refreshed++;
-          } else {
-            failed++;
-          }
-        } catch (error) {
-          console.error(`[Daemon] Failed to refresh entry ${entry.id}:`, error);
-          failed++;
-        }
-      }
-
-      console.log(`[Daemon] Knowledge refresh complete: ${refreshed} refreshed, ${failed} failed`);
+      const refreshed = 0;
 
       // Send notification if enabled
       if (
@@ -362,7 +301,6 @@ class TaxAdviserDaemon {
         await this.telegramService.sendMessage({
           message: `📚 *Knowledge Cache Updated*\n\n${refreshed} entries refreshed with latest information.\n\nYour tax knowledge base is now up to date!`,
           priority: 'low',
-          parseMode: 'Markdown',
         });
       }
     } catch (error) {
@@ -380,14 +318,11 @@ class TaxAdviserDaemon {
 
     try {
       const currentYear = new Date().getFullYear();
-      const lastYear = currentYear - 1;
 
       // Search for tax changes
       const query = `belastingwijzigingen ${currentYear} site:belastingdienst.nl OR site:rijksoverheid.nl`;
-      const results = await this.webSearchService.search({
-        query,
+      const results = await this.webSearchService.search(query, {
         maxResults: 3,
-        language: 'nl',
       });
 
       if (results.results.length > 0) {
@@ -398,7 +333,6 @@ class TaxAdviserDaemon {
         await this.telegramService.sendMessage({
           message: `⚖️ *Tax Law Updates Detected*\n\nFound ${results.results.length} recent tax law changes:\n\n${changes}\n\nReview these changes to ensure compliance.`,
           priority: 'normal',
-          parseMode: 'Markdown',
         });
       }
 

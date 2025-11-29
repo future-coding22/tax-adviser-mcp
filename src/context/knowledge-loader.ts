@@ -1,12 +1,11 @@
 import { KnowledgeCacheService } from '../services/knowledge-cache.js';
-import type { KnowledgeIndex, KnowledgeEntry } from '../types/index.js';
+import type { KnowledgeEntry } from '../types/index.js';
 
 /**
  * Knowledge loader - loads and provides access to cached knowledge
  */
 export class KnowledgeLoader {
   private cacheService: KnowledgeCacheService;
-  private index: KnowledgeIndex | null = null;
   private loaded: boolean = false;
 
   constructor(knowledgePath: string) {
