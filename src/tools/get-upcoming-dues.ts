@@ -47,17 +47,10 @@ export class GetUpcomingDuesTool implements ToolHandler {
     endDate.setDate(endDate.getDate() + daysAhead);
 
     // Get all recurring payments
-    const recurringPayments = profile.recurringPayments || { monthly: [], quarterly: [], annual: [] };
-
-    const allPayments = [
-      ...(recurringPayments.monthly || []),
-      ...(recurringPayments.quarterly || []),
-      ...(recurringPayments.annual || [])
-    ];
-
+    const recurringPayments = profile.recurringPayments || [];
     const upcomingDues: DueItem[] = [];
 
-    for (const payment of allPayments) {
+    for (const payment of recurringPayments) {
       // Filter by auto-pay
       if (!includeAutopay && payment.autoPay) {
         continue;

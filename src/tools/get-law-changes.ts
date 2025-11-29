@@ -58,7 +58,7 @@ export class GetLawChangesTool implements ToolHandler {
 
     // Get tax rules (currently we only have 2024 data)
     const currentRules = this.deps.taxKnowledge.getRules();
-    const currentYear = currentRules.taxYear;
+    const currentYear = currentRules.tax_year;
 
     // If comparing years we don't have data for, search the web
     if (fromYear !== currentYear && toYear !== currentYear) {
@@ -91,7 +91,7 @@ export class GetLawChangesTool implements ToolHandler {
           topic: 'General Tax Credit (Algemene Heffingskorting)',
           category: 'credits',
           oldValue: fromYear < currentYear ? 'Lower amount' : 'Unknown',
-          newValue: `€${currentRules.incomeTax.generalCredit.max}`,
+          newValue: `€${currentRules.income_tax.general_credit.max}`,
           detectedAt: new Date().toISOString(),
           significance: 'medium',
           affectsProfile: this.checkIfAffects('credits'),
@@ -123,7 +123,7 @@ export class GetLawChangesTool implements ToolHandler {
           topic: 'Self-Employment Deduction (Zelfstandigenaftrek)',
           category: 'self_employment',
           oldValue: fromYear < currentYear ? 'Different amount' : 'Unknown',
-          newValue: `€${currentRules.selfEmployment.zelfstandigenaftrek}`,
+          newValue: `€${currentRules.self_employment.zelfstandigenaftrek.amount}`,
           detectedAt: new Date().toISOString(),
           significance: 'high',
           affectsProfile: this.checkIfAffects('self_employment'),
@@ -135,7 +135,7 @@ export class GetLawChangesTool implements ToolHandler {
           topic: 'SME Profit Exemption (MKB-winstvrijstelling)',
           category: 'self_employment',
           oldValue: fromYear < currentYear ? 'Different percentage' : 'Unknown',
-          newValue: `${currentRules.selfEmployment.mkbVrijstelling}%`,
+          newValue: `${currentRules.self_employment.mkb_vrijstelling.percentage}%`,
           detectedAt: new Date().toISOString(),
           significance: 'medium',
           affectsProfile: this.checkIfAffects('self_employment'),
@@ -149,8 +149,8 @@ export class GetLawChangesTool implements ToolHandler {
         changes.push({
           topic: 'VAT Standard Rate',
           category: 'btw',
-          oldValue: `${currentRules.btw.standardRate}%`,
-          newValue: `${currentRules.btw.standardRate}%`,
+          oldValue: `${currentRules.btw.standard_rate}%`,
+          newValue: `${currentRules.btw.standard_rate}%`,
           detectedAt: new Date().toISOString(),
           significance: 'low',
           affectsProfile: this.checkIfAffects('btw'),

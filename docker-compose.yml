@@ -1,18 +1,16 @@
-version: '3.8'
-
 services:
   tax-advisor-dev:
     # Build from the Dockerfile in the current directory
     build:
       context: .
       dockerfile: Dockerfile
-    
+
     container_name: tax-advisor-mcp-dev
-    
+
     # Map the host port 3000 to the container port 3000
     # The MCP server runs on port 3000 by default
     ports:
-      - "3000:3000"
+      - "3033:3000"
       
     # Volumes for development to enable live-reloading and data persistence
     volumes:

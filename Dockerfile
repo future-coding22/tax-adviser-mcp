@@ -25,7 +25,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
-# RUN npm run build
+RUN npm run build
 
 # Stage 4: Final production image
 FROM base AS runner
@@ -34,7 +34,7 @@ WORKDIR /app
 # Copy production dependencies from 'deps' stage
 COPY --from=deps /app/node_modules ./node_modules
 # Copy compiled source code from 'builder' stage
-# COPY --from=builder /app/dist ./dist
+#COPY --from=builder /app/dist ./dist
 # Copy package.json to be able to run npm scripts
 COPY package.json .
 # Copy data and knowledge directories which are needed at runtime
@@ -42,9 +42,9 @@ COPY data ./data
 COPY knowledge ./knowledge
 
 # Expose the default port for the MCP server
-EXPOSE 3000
+EXPOSE 3033
 
 ENV NODE_ENV=production
 
 # The default command to start the server
-CMD ["npm", "--version"]
+CMD ["npm", "start"]

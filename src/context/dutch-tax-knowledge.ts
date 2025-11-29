@@ -94,18 +94,7 @@ export class DutchTaxKnowledge {
       }
 
       const bracketIncome = Math.min(income, bracket.to || income) - bracket.from;
-
-      // Handle different bracket types
-      if (bracket.type === 'percentage_of_income') {
-        // Simple percentage of income in bracket
-        credit += bracketIncome * ((bracket as any).rate / 100);
-      } else if (bracket.type === 'base_plus_percentage') {
-        // Base amount + percentage of income above bracket start
-        credit += (bracket as any).base + bracketIncome * ((bracket as any).additional_rate / 100);
-      } else if (bracket.type === 'fixed') {
-        // Fixed amount for this bracket
-        credit += (bracket as any).amount;
-      }
+      credit += bracketIncome * (bracket.rate / 100);
     }
 
     // Cap at maximum
@@ -191,11 +180,10 @@ export class DutchTaxKnowledge {
   /**
    * Get BTW rates
    */
-  getBTWRates(): { standard: number; reduced: number; zero: number } {
+  getBTWRates(): { standard: number; reduced: number } {
     return {
       standard: this.rules.btw.standardRate,
       reduced: this.rules.btw.reducedRate,
-      zero: 0,
     };
   }
 
@@ -210,10 +198,7 @@ export class DutchTaxKnowledge {
    * Get tax deadlines
    */
   getDeadlines() {
-    return {
-      income_tax: this.rules.deadlines.incomeTaxFiling,
-      btw_quarterly: this.rules.deadlines.btwQuarterly,
-    };
+    return this.rules.deadlines;
   }
 
   /**
@@ -265,18 +250,13 @@ export class DutchTaxKnowledge {
   /**
    * Get next tax deadline
    */
-  getNextDeadline(): { type: string; date: string; description: string } | null {
+  getNextDeadline(): { type: string; date: string } | null {
     const now = new Date();
     const deadlines = [
-      {
-        type: 'income_tax',
-        date: this.rules.deadlines.incomeTaxFiling,
-        description: 'Annual income tax return filing',
-      },
+      { type: 'Income Tax Filing', date: this.rules.deadlines.incomeTaxFiling },
       ...this.rules.deadlines.btwQuarterly.map((date: string, i: number) => ({
-        type: 'btw',
+        type: `BTW Q${i + 1}`,
         date,
-        description: `BTW Q${i + 1} ${i === 0 ? '(Jan-Mar)' : i === 1 ? '(Apr-Jun)' : i === 2 ? '(Jul-Sep)' : '(Oct-Dec)'} filing`,
       })),
     ];
 

@@ -1,5 +1,5 @@
 import type { ToolHandler, ToolDependencies } from './index.js';
-import type { Config, RefreshKnowledgeOutput } from '../types/index.js';
+import type { Config, RefreshKnowledgeInput, RefreshKnowledgeOutput } from '../types/index.js';
 
 /**
  * Refresh Knowledge Tool
@@ -12,17 +12,9 @@ export class RefreshKnowledgeTool implements ToolHandler {
   inputSchema = {
     type: 'object',
     properties: {
-      entryId: {
-        type: 'string',
-        description: 'Specific entry ID to refresh (optional)',
-      },
       id: {
         type: 'string',
-        description: 'Specific entry ID to refresh (optional, alias for entryId)',
-      },
-      expiredOnly: {
-        type: 'boolean',
-        description: 'Refresh only expired entries (default: true)',
+        description: 'Specific entry ID to refresh (optional)',
       },
       refresh_all_expired: {
         type: 'boolean',
@@ -36,10 +28,6 @@ export class RefreshKnowledgeTool implements ToolHandler {
         type: 'boolean',
         description: 'Force refresh even if not expired (default: false)',
       },
-      max_entries: {
-        type: 'number',
-        description: 'Maximum number of entries to refresh (optional)',
-      },
     },
   };
 
@@ -48,7 +36,7 @@ export class RefreshKnowledgeTool implements ToolHandler {
     private deps: ToolDependencies
   ) {}
 
-  async execute(input: any): Promise<RefreshKnowledgeOutput> {
+  async execute(input: RefreshKnowledgeInput): Promise<RefreshKnowledgeOutput> {
     if (!this.config.knowledge.enabled) {
       throw new Error('Knowledge base is disabled in configuration');
     }
@@ -57,38 +45,31 @@ export class RefreshKnowledgeTool implements ToolHandler {
     const failedDetails: any[] = [];
 
     try {
-      // Handle entryId with fallback to id parameter
-      const entryId = (input as any).entryId || (input as any).id;
-      const expiredOnly = (input as any).expiredOnly !== false; // Default to true
-      const force = (input as any).force || false;
-      const maxEntries = (input as any).max_entries || 100;
-
       // Scenario 1: Refresh specific entry
-      if (entryId) {
-        const result = await this.refreshEntry(entryId, force);
+      if (input.entryId) {
+        const result = await this.refreshEntry(input.entryId, false);
         if (result.success) {
           refreshedDetails.push({ id: result.id, status: 'refreshed' as const });
         } else {
           failedDetails.push({ id: result.id, status: 'failed' as const, reason: result.error });
         }
       }
-      // Scenario 2: Refresh expired entries (default behavior)
-      else if (expiredOnly) {
-        // Get expired entries from cache
-        let expiredEntries = await this.deps.knowledgeCache.getExpiredEntries();
+      // Scenario 2: Refresh all expired entries
+      else if (input.expiredOnly) {
+        const allEntries = await this.deps.knowledgeCache.getAllEntries();
 
-        // Filter by category if specified
-        if ((input as any).category) {
-          expiredEntries = expiredEntries.filter(
-            (entry: any) => entry.category === (input as any).category
-          );
-        }
-
-        // Limit by max_entries
-        expiredEntries = expiredEntries.slice(0, maxEntries);
+        const expiredEntries = allEntries.filter((entry: any) => {
+          const expiresAt = new Date(entry.expiresAt);
+          return expiresAt < new Date();
+        });
 
         for (const entry of expiredEntries) {
-          const result = await this.refreshEntry(entry.id, force);
+          // Filter by category if specified
+          if (input.category && entry.category !== input.category) {
+            continue;
+          }
+
+          const result = await this.refreshEntry(entry.id, true);
           if (result.success) {
             refreshedDetails.push({ id: result.id, status: 'refreshed' as const });
           } else {
@@ -97,17 +78,20 @@ export class RefreshKnowledgeTool implements ToolHandler {
         }
       }
       // Scenario 3: Refresh by category
-      else if ((input as any).category) {
-        const expiredEntries = await this.deps.knowledgeCache.getExpiredEntries();
-        let categoryEntries = expiredEntries.filter(
-          (entry: any) => entry.category === (input as any).category
+      else if (input.category) {
+        const allEntries = await this.deps.knowledgeCache.getAllEntries();
+        const categoryEntries = allEntries.filter(
+          (entry: any) => entry.category === input.category
         );
 
-        // Limit by max_entries
-        categoryEntries = categoryEntries.slice(0, maxEntries);
-
         for (const entry of categoryEntries) {
-          const result = await this.refreshEntry(entry.id, force);
+          // Only refresh expired
+          const isExpired = new Date(entry.expiresAt) < new Date();
+          if (!isExpired) {
+            continue;
+          }
+
+          const result = await this.refreshEntry(entry.id, false);
           if (result.success) {
             refreshedDetails.push({ id: result.id, status: 'refreshed' as const });
           } else {
@@ -115,20 +99,7 @@ export class RefreshKnowledgeTool implements ToolHandler {
           }
         }
       } else {
-        // If no parameters specified, refresh expired by default
-        let expiredEntries = await this.deps.knowledgeCache.getExpiredEntries();
-
-        // Limit by max_entries
-        expiredEntries = expiredEntries.slice(0, maxEntries);
-
-        for (const entry of expiredEntries) {
-          const result = await this.refreshEntry(entry.id, force);
-          if (result.success) {
-            refreshedDetails.push({ id: result.id, status: 'refreshed' as const });
-          } else {
-            failedDetails.push({ id: result.id, status: 'failed' as const, reason: result.error });
-          }
-        }
+        throw new Error('Must specify either entryId, expiredOnly, or category');
       }
 
       return {

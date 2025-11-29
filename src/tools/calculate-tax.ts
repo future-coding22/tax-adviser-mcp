@@ -46,19 +46,19 @@ export class CalculateTaxEstimateTool implements ToolHandler {
     const year = input.year || this.config.tax.year || new Date().getFullYear();
 
     // Apply scenario overrides if provided
-    const employmentIncome = Number(input.incomeOverride?.employment ?? profile.income.employment ?? 0) || 0;
-    const freelanceIncome = Number(input.incomeOverride?.freelance ?? profile.income.freelance?.profit ?? 0) || 0;
-    const otherIncome = Number(input.incomeOverride?.other ?? profile.income.other ?? 0) || 0;
+    const employmentIncome = input.incomeOverride?.employment ?? profile.income.employment ?? 0;
+    const freelanceIncome = input.incomeOverride?.freelance ?? profile.income.freelance?.profit ?? 0;
+    const otherIncome = input.incomeOverride?.other ?? profile.income.other ?? 0;
 
     // Calculate assets and debts
     const totalAssets =
-      Number(profile.assets.bankAccounts.savings || 0) +
-      Number(profile.assets.bankAccounts.checking || 0) +
-      Number(profile.assets.investments.stocksETFs || 0) +
-      Number(profile.assets.investments.crypto || 0);
+      profile.assets.bankAccounts.savings +
+      profile.assets.bankAccounts.checking +
+      (profile.assets.investments.stocksETFs || 0) +
+      (profile.assets.investments.crypto || 0);
 
     const totalDebts =
-      Number(profile.assets.debts.studentLoan || 0) + Number(profile.assets.debts.personalLoans || 0);
+      (profile.assets.debts.studentLoan || 0) + (profile.assets.debts.personalLoans || 0);
 
     // ===================
     // BOX 1: INCOME TAX

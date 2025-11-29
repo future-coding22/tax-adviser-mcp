@@ -221,7 +221,7 @@ export class PersonalProfileLoader {
    * Parse recurring payments section
    */
   private parseRecurringPayments(
-    markdown: string,
+    _markdown: string,
     warnings: string[]
   ): PersonalProfile['recurringPayments'] {
     const recurringPayments: PersonalProfile['recurringPayments'] = {
