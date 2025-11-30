@@ -2,6 +2,7 @@ import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import matter from 'gray-matter';
 import type { PersonalProfile, ParsedPersonalData } from '../types/index.js';
+import type { PaymentItem } from '../types/personal.js';
 
 /**
  * Parse personal.md file into structured data
@@ -218,19 +219,125 @@ export class PersonalProfileLoader {
 
   /**
    * Parse recurring payments section
-   * Note: Simplified version - table parsing will be enhanced in Phase 3
    */
   private parseRecurringPayments(
-    _markdown: string,
+    markdown: string,
     warnings: string[]
   ): PersonalProfile['recurringPayments'] {
-    warnings.push('Recurring payments parsing is simplified in this version');
-
-    return {
+    const recurringPayments: PersonalProfile['recurringPayments'] = {
       monthly: [],
       quarterly: [],
       annual: [],
     };
+
+    const monthlyTable = this.extractTable(markdown, '### Monthly');
+    if (monthlyTable) {
+      recurringPayments.monthly = this.parseMarkdownTable(monthlyTable, warnings);
+    } else {
+      warnings.push('Monthly recurring payments table not found or malformed.');
+    }
+
+    const quarterlyTable = this.extractTable(markdown, '### Quarterly');
+    if (quarterlyTable) {
+      recurringPayments.quarterly = this.parseMarkdownTable(quarterlyTable, warnings);
+    } else {
+      warnings.push('Quarterly recurring payments table not found or malformed.');
+    }
+
+    const annualTable = this.extractTable(markdown, '### Annual');
+    if (annualTable) {
+      recurringPayments.annual = this.parseMarkdownTable(annualTable, warnings);
+    } else {
+      warnings.push('Annual recurring payments table not found or malformed.');
+    }
+
+    return recurringPayments;
+  }
+
+  /**
+   * Helper: Extract a markdown table following a heading
+   */
+  private extractTable(markdown: string, heading: string): string | null {
+    const regex = new RegExp(`${heading}\\s*\\n\\|(.+)\\|\\n\\|(.+)\\|\\n((?:\\|.*\\|\\n)*)`, 'm');
+    const match = markdown.match(regex);
+    if (match) {
+      return `|${match[1]}|\n|${match[2]}|\n${match[3]}`;
+    }
+    return null;
+  }
+
+  /**
+   * Helper: Parse a markdown table into PaymentItem[]
+   */
+  private parseMarkdownTable(tableMarkdown: string, warnings: string[]): PaymentItem[] {
+    const lines = tableMarkdown.trim().split('\n');
+    if (lines.length < 2) return []; // Need at least header and separator
+
+    const header = lines[0].split('|').map(h => h.trim().toLowerCase()).filter(h => h);
+    const dataRows = lines.slice(2); // Skip header and separator line
+
+    const payments: PaymentItem[] = [];
+
+    for (const row of dataRows) {
+      const cells = row.split('|').map(c => c.trim()).filter(c => c);
+      if (cells.length !== header.length) {
+        warnings.push(`Skipping malformed row in recurring payments table: ${row}`);
+        continue;
+      }
+
+      const payment: Partial<PaymentItem> = {};
+      for (let i = 0; i < header.length; i++) {
+        const key = header[i];
+        const value = cells[i];
+
+        switch (key) {
+          case 'item':
+            payment.description = value;
+            break;
+          case 'amount':
+            payment.amount = value.startsWith('€') ? this.parseAmount(value.substring(1)) : value as 'variable';
+            break;
+          case 'due date':
+            payment.dueDate = value; // Can be '1st', '15th', or 'May 1' etc. - keep as string for now
+            break;
+          case 'auto-pay':
+            payment.autoPay = value.toLowerCase() === 'yes';
+            break;
+          case 'category': // This column isn't in personal.md example, so default to 'other'
+            payment.category = value.toLowerCase() as PaymentItem['category'];
+            break;
+        }
+      }
+
+      if (payment.description && payment.amount !== undefined && payment.dueDate) {
+        // Assign a default category if not present in markdown
+        if (!payment.category) {
+            if (payment.description.toLowerCase().includes('rent')) payment.category = 'rent';
+            else if (payment.description.toLowerCase().includes('insurance') || payment.description.toLowerCase().includes('zorgverzekering')) payment.category = 'insurance';
+            else if (payment.description.toLowerCase().includes('utilities') || payment.description.toLowerCase().includes('vattenfall')) payment.category = 'utilities';
+            else if (payment.description.toLowerCase().includes('internet') || payment.description.toLowerCase().includes('kpn')) payment.category = 'utilities';
+            else if (payment.description.toLowerCase().includes('phone')) payment.category = 'utilities';
+            else if (payment.description.toLowerCase().includes('btw')) payment.category = 'tax';
+            else if (payment.description.toLowerCase().includes('tax')) payment.category = 'tax';
+            else if (payment.description.toLowerCase().includes('municipal taxes') || payment.description.toLowerCase().includes('gemeentebelasting')) payment.category = 'tax';
+            else if (payment.description.toLowerCase().includes('water board tax') || payment.description.toLowerCase().includes('waterschapsbelasting')) payment.category = 'tax';
+            else payment.category = 'other';
+        }
+
+        payments.push({
+          id: `${payment.description}-${payment.dueDate}`,
+          description: payment.description,
+          amount: payment.amount,
+          dueDate: payment.dueDate,
+          autoPay: payment.autoPay || false,
+          category: payment.category,
+        });
+      } else {
+        warnings.push(`Skipping incomplete payment item: ${JSON.stringify(payment)}`);
+      }
+    }
+
+    return payments;
   }
 
   /**

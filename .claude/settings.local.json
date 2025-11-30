@@ -10,7 +10,11 @@
       "Bash(1)",
       "Bash(cat:*)",
       "Bash(timeout 3 npm start)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(npm test:*)",
+      "Bash(tsx test-all-tools.ts:*)",
+      "Bash(npx tsx:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

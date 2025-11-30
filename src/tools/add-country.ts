@@ -17,8 +17,11 @@ export interface AddCountryInput {
   /** Country code (ISO 2-letter, e.g., "US", "GB", "DE") */
   country_code: string;
 
-  /** Country name (English, e.g., "United States", "United Kingdom") */
-  country_name: string;
+  /** Country name (English, e.g., "United States", "United Kingdom") - optional, will be looked up if not provided */
+  country_name?: string;
+
+  /** Tax year for discovery (optional) */
+  tax_year?: number;
 
   /** Generate example personal.md template */
   generate_template?: boolean;
@@ -68,7 +71,11 @@ export class AddCountryTool implements ToolHandler {
       },
       country_name: {
         type: 'string',
-        description: 'Country name in English (e.g., "United States", "Germany")',
+        description: 'Country name in English (e.g., "United States", "Germany") - optional',
+      },
+      tax_year: {
+        type: 'number',
+        description: 'Tax year for discovery (optional)',
       },
       generate_template: {
         type: 'boolean',
@@ -82,7 +89,7 @@ export class AddCountryTool implements ToolHandler {
         default: 'medium',
       },
     },
-    required: ['country_code', 'country_name'],
+    required: ['country_code'],
   };
 
   constructor(
@@ -93,6 +100,9 @@ export class AddCountryTool implements ToolHandler {
   async execute(input: AddCountryInput): Promise<AddCountryOutput> {
     const countryCode = input.country_code.toUpperCase();
 
+    // Default country name if not provided
+    const countryName = input.country_name || this.getCountryNameFromCode(countryCode);
+
     // Check if country already exists
     const glossary = getGlossaryLoader();
     const exists = await glossary.hasCountry(countryCode);
@@ -101,7 +111,7 @@ export class AddCountryTool implements ToolHandler {
       return {
         success: false,
         country_code: countryCode,
-        country_name: input.country_name,
+        country_name: countryName,
         glossary_path: '',
         warnings: [`Country ${countryCode} already has a glossary. Use update_country to modify it.`],
         next_steps: [
@@ -117,12 +127,12 @@ export class AddCountryTool implements ToolHandler {
     }
 
     // Run autonomous discovery
-    console.error(`\n🚀 Starting autonomous country setup for ${input.country_name} (${countryCode})`);
+    console.error(`\n🚀 Starting autonomous country setup for ${countryName} (${countryCode})`);
     console.error('This will take a few minutes as we search for tax information...\n');
 
     const setupConfig: SetupCountryConfig = {
       countryCode,
-      countryName: input.country_name,
+      countryName,
       generateTemplate: input.generate_template ?? true,
       thoroughness: input.thoroughness || 'medium',
     };
@@ -161,7 +171,7 @@ export class AddCountryTool implements ToolHandler {
     return {
       success: true,
       country_code: countryCode,
-      country_name: input.country_name,
+      country_name: countryName,
       glossary_path: result.glossaryPath,
       template_path: result.templatePath,
       warnings,
@@ -172,5 +182,30 @@ export class AddCountryTool implements ToolHandler {
         business_structures_found: result.discovered.business_structures.length,
       },
     };
+  }
+
+  /**
+   * Get country name from ISO code (for common countries)
+   */
+  private getCountryNameFromCode(code: string): string {
+    const countryNames: Record<string, string> = {
+      'US': 'United States',
+      'GB': 'United Kingdom',
+      'DE': 'Germany',
+      'FR': 'France',
+      'IT': 'Italy',
+      'ES': 'Spain',
+      'NL': 'Netherlands',
+      'BE': 'Belgium',
+      'AT': 'Austria',
+      'CH': 'Switzerland',
+      'CA': 'Canada',
+      'AU': 'Australia',
+      'JP': 'Japan',
+      'CN': 'China',
+      'IN': 'India',
+      'BR': 'Brazil',
+    };
+    return countryNames[code] || `Country ${code}`;
   }
 }

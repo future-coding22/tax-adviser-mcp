@@ -1,0 +1,180 @@
+{
+  "country": {
+    "code": "DE",
+    "name": "Germany",
+    "official_name": "Official name of Germany",
+    "language": "de",
+    "currency": "EUR",
+    "tax_year_start": "01-01",
+    "tax_year_end": "12-31"
+  },
+  "tax_authority": {
+    "name": "Germany Tax Authority",
+    "official_name": "Official Germany Tax Authority",
+    "website": "https://tax.gov.example",
+    "contact": {
+      "phone": "+1-555-0100",
+      "email": "info@tax.gov.example",
+      "address": "Tax Authority Address (needs manual update)"
+    },
+    "legal_database": "https://laws.gov.example"
+  },
+  "terms": [
+    {
+      "local_term": "Germany income tax",
+      "concept_id": "income_tax",
+      "translation": "Germany income tax",
+      "full_name": "Germany Germany income tax",
+      "contextual_meaning": "Tax concept in Germany - requires manual description",
+      "search_terms": [
+        "germany income tax"
+      ],
+      "warnings": [
+        "This entry was auto-generated and needs manual verification"
+      ],
+      "official_page": "https://www.belastingdienst.nl/zoeken?q=Germany%20income%20tax%20official%20name"
+    },
+    {
+      "local_term": "Germany VAT sales tax",
+      "concept_id": "vat",
+      "translation": "Germany VAT sales tax",
+      "full_name": "Germany Germany VAT sales tax",
+      "contextual_meaning": "Tax concept in Germany - requires manual description",
+      "search_terms": [
+        "germany vat sales tax"
+      ],
+      "warnings": [
+        "This entry was auto-generated and needs manual verification"
+      ],
+      "official_page": "https://www.belastingdienst.nl/zoeken?q=Germany%20VAT%20sales%20tax%20official%20name"
+    },
+    {
+      "local_term": "Germany corporate tax",
+      "concept_id": "corporate_tax",
+      "translation": "Germany corporate tax",
+      "full_name": "Germany Germany corporate tax",
+      "contextual_meaning": "Tax concept in Germany - requires manual description",
+      "search_terms": [
+        "germany corporate tax"
+      ],
+      "warnings": [
+        "This entry was auto-generated and needs manual verification"
+      ],
+      "official_page": "https://www.belastingdienst.nl/zoeken?q=Germany%20corporate%20tax%20official%20name"
+    },
+    {
+      "local_term": "Germany social security",
+      "concept_id": "social_security",
+      "translation": "Germany social security",
+      "full_name": "Germany Germany social security",
+      "contextual_meaning": "Tax concept in Germany - requires manual description",
+      "search_terms": [
+        "germany social security"
+      ],
+      "warnings": [
+        "This entry was auto-generated and needs manual verification"
+      ],
+      "official_page": "https://www.belastingdienst.nl/zoeken?q=Germany%20social%20security%20official%20name"
+    },
+    {
+      "local_term": "Germany wealth tax",
+      "concept_id": "wealth_tax",
+      "translation": "Germany wealth tax",
+      "full_name": "Germany Germany wealth tax",
+      "contextual_meaning": "Tax concept in Germany - requires manual description",
+      "search_terms": [
+        "germany wealth tax"
+      ],
+      "warnings": [
+        "This entry was auto-generated and needs manual verification"
+      ],
+      "official_page": "https://www.belastingdienst.nl/zoeken?q=Germany%20wealth%20tax%20official%20name"
+    },
+    {
+      "local_term": "Germany inheritance tax",
+      "concept_id": "inheritance_tax",
+      "translation": "Germany inheritance tax",
+      "full_name": "Germany Germany inheritance tax",
+      "contextual_meaning": "Tax concept in Germany - requires manual description",
+      "search_terms": [
+        "germany inheritance tax"
+      ],
+      "warnings": [
+        "This entry was auto-generated and needs manual verification"
+      ],
+      "official_page": "https://www.belastingdienst.nl/zoeken?q=Germany%20inheritance%20tax%20official%20name"
+    },
+    {
+      "local_term": "Germany property tax",
+      "concept_id": "property_tax",
+      "translation": "Germany property tax",
+      "full_name": "Germany Germany property tax",
+      "contextual_meaning": "Tax concept in Germany - requires manual description",
+      "search_terms": [
+        "germany property tax"
+      ],
+      "warnings": [
+        "This entry was auto-generated and needs manual verification"
+      ],
+      "official_page": "https://www.belastingdienst.nl/zoeken?q=Germany%20property%20tax%20official%20name"
+    }
+  ],
+  "calendar": {
+    "tax_year": 2025,
+    "deadlines": [
+      {
+        "name": "Annual Income Tax Filing",
+        "local_name": "Annual Tax Return Deadline",
+        "date": "2025-12-31",
+        "type": "filing",
+        "concept_id": "annual_tax_return",
+        "description": "Annual income tax return filing deadline (verify date)",
+        "can_extend": true,
+        "extension_deadline": "2025-02-28",
+        "recurrence": "annual"
+      }
+    ]
+  },
+  "business_structures": [
+    {
+      "local_term": "Germany sole proprietor",
+      "concept_id": "sole_proprietor",
+      "translation": "Germany sole proprietor",
+      "full_name": "Germany sole proprietor",
+      "registration_required": true,
+      "tax_implications": [
+        "Requires manual documentation"
+      ]
+    },
+    {
+      "local_term": "Germany partnership",
+      "concept_id": "partnership",
+      "translation": "Germany partnership",
+      "full_name": "Germany partnership",
+      "registration_required": true,
+      "tax_implications": [
+        "Requires manual documentation"
+      ]
+    },
+    {
+      "local_term": "Germany LLC",
+      "concept_id": "limited_liability_company",
+      "translation": "Germany LLC",
+      "full_name": "Germany LLC",
+      "registration_required": true,
+      "tax_implications": [
+        "Requires manual documentation"
+      ]
+    },
+    {
+      "local_term": "Germany corporation",
+      "concept_id": "corporation",
+      "translation": "Germany corporation",
+      "full_name": "Germany corporation",
+      "registration_required": true,
+      "tax_implications": [
+        "Requires manual documentation"
+      ]
+    }
+  ]
+}
