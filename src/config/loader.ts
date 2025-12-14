@@ -66,7 +66,7 @@ export class ConfigLoader {
   private replaceEnvironmentVariables(obj: any): any {
     if (typeof obj === 'string') {
       // Match ${VAR_NAME} pattern
-      const envVarPattern = /\$\{([A-Z_]+)\}/g;
+      const envVarPattern = /\$\{([a-zA-Z0-9_]+)\}/g;
       return obj.replace(envVarPattern, (_match, varName) => {
         const value = process.env[varName];
         if (value === undefined) {

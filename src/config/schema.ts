@@ -16,7 +16,9 @@ const timeSchema = z.string().regex(/^([01]?\d|2[0-3]):[0-5]\d$/, {
 
 const environmentVariableSchema = z
   .string()
-  .regex(/^\${[A-Z_]+}$/, { message: 'Environment variable must use ${VAR_NAME} format' })
+  .regex(/^\${[a-zA-Z0-9_]+}$/, {
+    message: 'Environment variable must use ${VAR_NAME} format',
+  })
   .or(z.string().min(1));
 
 // =============================================================================
